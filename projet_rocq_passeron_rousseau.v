@@ -211,20 +211,8 @@ Definition split_occ {A: Type} (eq_dec: forall (x y : A), {x=y}+{~x=y}) (v: A) (
   split_p (fun x => if eq_dec x v then true else false) l.
 
 Lemma split_occ_first: forall (A: Type) (eq_dec: forall (x y : A), {x=y}+{~x=y}) (v: A) (l: list A),
-Forall (fun x => x = v) (fst (split_occ eq_dec v l)). 
+Forall (fun x => ~(x = v)) (fst (split_occ eq_dec v l)). 
 Proof.
-intros A eq_dec v. induction l.
-- simpl. apply Forall_nil.
-- unfold split_occ. simpl.
-  destruct (eq_dec a v) eqn:HAV.
-  + simpl. apply Forall_nil.
-  + destruct split_p as [Left Right] eqn: Hsplit.
-    simpl. apply Forall_cons.
-    * contradiction n.
-
-
-
-
-
+Admitted.
 
 
