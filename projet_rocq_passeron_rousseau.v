@@ -207,12 +207,55 @@ Qed.
 Require Import Coq.Classes.EquivDec.
 Require Import Coq.Bool.Bool.
 
+
 Definition split_occ {A: Type} (eq_dec: forall (x y : A), {x=y}+{~x=y}) (v: A) (l: list A) :=
   split_p (fun x => if eq_dec x v then true else false) l.
 
 Lemma split_occ_first: forall (A: Type) (eq_dec: forall (x y : A), {x=y}+{~x=y}) (v: A) (l: list A),
 Forall (fun x => ~(x = v)) (fst (split_occ eq_dec v l)). 
 Proof.
-Admitted.
+intros A eq_dec v.
+induction l.
+- simpl. apply Forall_nil.
+- unfold split_occ.
+  simpl.
+  destruct (eq_dec a v) eqn:HAV.
+  + simpl. apply Forall_nil.
+  + destruct split_p as [Left Right] eqn: Hsplit.
+    unfold split_occ in IHl.
+    rewrite Hsplit in IHl.
+    simpl in IHl.
+    simpl.
+    apply Forall_cons.
+    * exact n.
+    * exact IHl.
+Qed.
+
+Definition mem {A : Type} (eq_dec: forall (x y : A), {x=y}+{~x=y}) (x : A) (l : list A) : bool :=
+  existsb (fun v => if eq_dec x v then true else false) l.
+
+
+
+Lemma split_occ_snd_starts_with_v: forall 
+  (A: Type) 
+  (eq_dec: forall (x y : A), {x=y}+{~x=y}) 
+  (v: A) (l: list A), 
+    snd (split_occ eq_dec v l) = [] \/ (exists (l': list A), snd(split_occ eq_dec v l) = v :: l').
+Proof.
+  intros.
+  induction l.
+  - simpl. left. reflexivity.
+  - destruct (eq_dec0 a v) eqn: H.
+    + rewrite e.
+      right.
+      exists l.
+      unfold split_occ.
+      simpl.
+      destruct (eq_dec0 v v).
+      simpl.
+      reflexivity.
+      contradiction.
+    + left.
+      unfold split_occ.
 
 
