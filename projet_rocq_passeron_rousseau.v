@@ -242,20 +242,19 @@ Lemma split_occ_snd_starts_with_v: forall
   (v: A) (l: list A), 
     snd (split_occ eq_dec v l) = [] \/ (exists (l': list A), snd(split_occ eq_dec v l) = v :: l').
 Proof.
-  intros.
+  intros A eq_dec v l.
+  unfold split_occ.
   induction l.
   - simpl. left. reflexivity.
-  - destruct (eq_dec0 a v) eqn: H.
-    + rewrite e.
-      right.
-      exists l.
-      unfold split_occ.
-      simpl.
-      destruct (eq_dec0 v v).
-      simpl.
-      reflexivity.
-      contradiction.
-    + left.
-      unfold split_occ.
+  - simpl. destruct (eq_dec a v) eqn:Hav.
+    + right. exists l. rewrite e. reflexivity.
+    + destruct (split_p (fun x => if eq_dec x v then true else false) l) eqn:Hsplit.
+      exact IHl.
+Qed.
+      
 
+
+ (* Multi ensembles *)
+
+ Parameter T : Type.
 
