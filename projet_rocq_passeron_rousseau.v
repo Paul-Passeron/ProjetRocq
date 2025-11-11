@@ -252,9 +252,89 @@ Proof.
       exact IHl.
 Qed.
       
+(* Exercice 2 *)
+(* Multi ensembles *)
 
+Parameter T : Type.
 
- (* Multi ensembles *)
+Parameter T_eq_dec: forall (x y : T), {x=y} + {~x=y}.
 
- Parameter T : Type.
+Definition multiset := list (T*nat).
 
+(* question 1 *)
+
+Definition empty : multiset := ([]).
+
+(* (*Count starts at 0 so that there is no room for invalid (a, 0) tuples*)
+Definition singleton (x: T) : multiset := [(x, 0)]. *)
+
+Definition singleton (t:T) : multiset := [(t,1)].
+
+Fixpoint member (t:T) (m:multiset) : bool := match m with 
+  |[] => false 
+  |(x,_)::m' => if T_eq_dec x t then true
+                else member t m'
+end.
+
+Fixpoint add (t:T) (n:nat) (m:multiset) : multiset := match m with
+  |[] => [(t,n)]
+  |(x,xn)::m' => if T_eq_dec x t then (x,xn+n)::m'
+                 else (x,xn)::(add t n m')
+end.
+
+Fixpoint multiplicity (t:T) (m:multiset) : nat := match m with
+  |[] => 0
+  |(x,xn)::m' => if T_eq_dec x t then xn
+                 else multiplicity t m'
+end.
+
+Fixpoint removeOne (t:T) (m:multiset) : multiset := match m with
+  |[] => []
+  |(x,xn)::m' => if T_eq_dec x t then
+                     if xn=?1 then m'
+                     else (x,xn-1)::m'
+                 else (x,xn)::(removeOne t m')
+end.
+
+Fixpoint removeAll (t:T) (m:multiset) : multiset := match m with
+  |[] => []
+  |(x,xn)::m' => if T_eq_dec x t then m'
+                 else (x,xn)::(removeAll t m')
+end.
+
+(* question 2a *)
+Definition InMultiset (t:T) (m:multiset) : Prop := (member t m) = true.
+
+(* question 2b *)
+(*Definition wf (t:T) (m:multiset) : Prop := (member t m) -> (member t (removeAll t m))=false.*)
+
+(* question 2c *)
+(* question 3 *)
+Lemma x_not_in_empty : forall x, ~ InMultiset x empty.
+Proof.
+intros. unfold not. intros. unfold InMultiset in H. simpl in H. discriminate.
+Qed.
+
+Lemma prop_2 : forall x y , InMultiset y (singleton x) <-> x = y.
+Proof.
+  intros.
+  unfold InMultiset, singleton.
+  simpl.
+  destruct (T_eq_dec x y) as [Heq | Hneq].
+  -split.
+    +intros. exact Heq.
+    +intros. reflexivity. 
+  -split. 
+    +intros. discriminate H.
+    +intros. contradiction.
+Qed.
+
+Lemma prop_3 : forall x, multiplicity x (singleton x) = 1.
+Proof.
+  intros.
+  unfold singleton.
+  simpl.
+  destruct (T_eq_dec x x) as [Heq | Hneq].
+  -reflexivity.
+  -contradiction.
+Qed.
