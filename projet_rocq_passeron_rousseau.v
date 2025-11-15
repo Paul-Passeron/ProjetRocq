@@ -416,21 +416,23 @@ Qed.
 
 Lemma prop_5 : forall x n s, n > 0 -> InMultiset x (add x n s).
 Proof.
-  intros.
+  intros x n s Hn.
   unfold InMultiset.
-  induction s as [| [y k] s' IH].
-  - simpl. destruct (T_eq_dec x x) as [Heq|Hneq].
-    + reflexivity.
-    + contradiction.
-  - simpl. destruct (T_eq_dec y x) as [Heq | Hneq].
-    + subst.
-      simpl. destruct (T_eq_dec x x) as [Heq|Hneq].
+  destruct n as [| n'].
+  - lia.
+  - induction s as [| [y k] s' IH].
+    + simpl. destruct (T_eq_dec x x) as [Heq|Hneq].
       * reflexivity.
       * contradiction.
-    + simpl. destruct (T_eq_dec y x) as [Heq2|Hneq2].
-      * contradiction.
-      * apply IH.
+    + simpl. destruct (T_eq_dec y x) as [Heq|Hneq].
+      * simpl. subst y. destruct (T_eq_dec x x) as [Heq2|Hneq2].
+        -- reflexivity.
+        -- contradiction.
+      * simpl. destruct (T_eq_dec y x) as [Heq2|Hneq2].
+        -- contradiction.
+        -- apply IH.
 Qed.
+
 
 Lemma prop_6 : forall x y n s, x <> y -> (InMultiset y (add x n s) <-> InMultiset y s).
 Proof.
