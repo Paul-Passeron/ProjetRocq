@@ -265,7 +265,7 @@ Definition empty : multiset := ([]).
 (* (*Count starts at 0 so that there is no room for invalid (a, 0) tuples*)
 Definition singleton (x: T) : multiset := [(x, 0)]. *)
 
-Definition singleton (t:T) : multiset := [(t,0)].
+Definition singleton (t:T) : multiset := [(t,1)].
 
 Fixpoint member (t:T) (m:multiset) : bool := match m with
   |[] => false
@@ -281,14 +281,14 @@ end.
 
 Fixpoint multiplicity (t:T) (m:multiset) : nat := match m with
   |[] => 0
-  |(x,xn)::m' => if T_eq_dec x t then xn + 1
+  |(x,xn)::m' => if T_eq_dec x t then xn
                  else multiplicity t m'
 end.
 
 Fixpoint removeOne (t:T) (m:multiset) : multiset := match m with
   |[] => []
   |(x,xn)::m' => if T_eq_dec x t then
-                     if xn=?0 then m'
+                     if xn=?1 then m'
                      else (x,xn-1)::m'
                  else (x,xn)::(removeOne t m')
 end.
@@ -307,6 +307,7 @@ Fixpoint wf (m: multiset) : Prop :=
   match m with
   | [] => True
   | (x, n) :: m' =>
+      n > 0 /\
       (* x ne doit pas apparaître dans m' *)
       (forall y occ, In (y, occ) m' -> y <> x) /\
       (* le reste de la liste doit aussi être bien formé *)
@@ -332,11 +333,14 @@ Proof.
   split.
   intro H.
   - apply proj2 in H.
+    apply proj2 in H.
     exact H.
   - split.
-    + intros y n contr.
-      contradiction.
-    + exact H.
+    + lia. 
+    + split.
+      * intros y n contr.
+        contradiction.
+      * exact H.
 Qed.
 
 Lemma add_wf: forall (x: T) (n: nat) (s: multiset) , wf s -> wf (add x n s).
