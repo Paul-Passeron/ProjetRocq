@@ -273,8 +273,10 @@ Fixpoint member (t:T) (m:multiset) : bool := match m with
                 else member t m'
 end.
 
-Fixpoint add (t:T) (n:nat) (m:multiset) : multiset := match m with
-  |[] => [(t,n - 1)]
+Fixpoint add (t:T) (n:nat) (m:multiset) : multiset :=
+if n == 0 then m else 
+match m with
+  |[] => [(t,n)]
   |(x,xn)::m' => if T_eq_dec x t then (x,xn+n)::m'
                  else (x,xn)::(add t n m')
 end.
@@ -345,7 +347,25 @@ Qed.
 
 Lemma add_wf: forall (x: T) (n: nat) (s: multiset) , wf s -> wf (add x n s).
 Proof.
-Admitted.
+  intros x n.
+  induction s.
+  intro H.
+  - simpl.
+    destruct n.
+    + simpl.
+      simpl in H.
+      exact H.
+    + simpl.
+      split.
+      * lia.
+      * split.
+        --  intros y n' contr.
+            contradiction.
+        --  simpl in H.
+            exact H.
+  - intro Hn.
+Abort.     
+      
 
 Lemma removeOne_wf: forall (s: multiset) (x: T), wf s -> wf (removeOne x s).
 Proof.
@@ -427,8 +447,6 @@ Proof.
     + intro. 
 Abort.
 
-
-
 Lemma prop_7 : forall x s, wf s -> (multiplicity x s = 0 <-> ~InMultiset x s).
 Proof.
   intros.
@@ -436,12 +454,10 @@ Proof.
   - intro. unfold InMultiset. 
 Abort.
 
-
 Lemma prop_8 : forall x n s, multiplicity x (add x n s) = n + (multiplicity x s).
 Proof.
   intros.
 Abort.
-
 
 Lemma prop_9 : forall x n y s, x <> y -> wf s -> multiplicity y (add x n s) = multiplicity y s.
 Proof.
