@@ -321,12 +321,24 @@ Proof.
   reflexivity.
 Qed.
 
+Require Import PeanoNat.
+Require Import Coq.Logic.PropExtensionality.
+
 Lemma singleton_wf: forall x: T, wf (singleton x) = True.
 Proof.
   intro x.
   simpl.
-  (*apply proj1 ((forall y : T, nat -> False -> y <> x)).*)
-  Abort.
+  apply propositional_extensionality.
+  split.
+  intro H.
+  - apply proj2 in H.
+    exact H.
+  - split.
+    + intros y n contr.
+      contradiction.
+    + exact H.
+Qed.  
+
 
 (* question 3 *)
 Lemma x_not_in_empty : forall x, ~ InMultiset x empty.
