@@ -1,17 +1,21 @@
 Require Import List.
 Import ListNotations.
 
-Require Import Coq.Arith.PeanoNat.
+Require Import Stdlib.Arith.PeanoNat.
 Import Nat.
 
-Fixpoint repeat (A: Type) (x: A) (n: nat): list A :=
+Parameter A: Type.
+
+Parameter A_eq_dec: forall (x y: A), {x=y} + {~x=y}.
+
+Fixpoint repeat (x: A) (n: nat): list A :=
  match n with
   | 0  => []
-  | S (n') => x::(repeat A x n')
+  | S (n') => x::(repeat x n')
 end.
 
-Lemma repeat_sound1: forall (A: Type) (a: A) n,
-  Forall (fun x => x=a) (repeat A a n).
+Lemma repeat_sound1: forall (a: A) n,
+  Forall (fun x => x=a) (repeat a n).
 Proof.
 induction n.
 - unfold repeat. apply Forall_nil.
@@ -20,15 +24,15 @@ induction n.
   + exact IHn.
 Qed.
 
-Lemma repeat_sound2: forall (A: Type) (a: A) n,
-  length (repeat A a n) = n.
+Lemma repeat_sound2: forall (a: A) n,
+  length (repeat a n) = n.
 Proof.
 induction n.
 - simpl. reflexivity.
 - simpl. rewrite IHn. reflexivity.
 Qed.
 
-Fixpoint split_p_aux {A: Type} (p: A -> bool) (l: list A) (acc: list A) := 
+Fixpoint split_p_aux (p: A -> bool) (l: list A) (acc: list A) := 
 match l with
   | [] => (acc, [])
   | head::tail => match p head with
@@ -37,9 +41,9 @@ match l with
   end
 end.
 
-Definition split_p_acc {A: Type} (p: A -> bool) (l: list A)  := split_p_aux p l [].
+Definition split_p_acc (p: A -> bool) (l: list A)  := split_p_aux p l [].
 
-Fixpoint split_p {A: Type} (p: A -> bool) (l: list A) :=
+Fixpoint split_p (p: A -> bool) (l: list A) :=
 match l with
   | [] => ([], [])
   | head::tail => match p head with
@@ -48,10 +52,10 @@ match l with
   end
 end.
 
-Lemma split_p_first : forall (A : Type) (p : A -> bool) (l : list A),
+Lemma split_p_first : forall (p : A -> bool) (l : list A),
 Forall (fun x => p x = false) (fst (split_p p l)) .
 Proof.
-intros A p.
+intros p.
 induction l.
 -simpl. apply Forall_nil.
 - simpl. case (p a) eqn:Ha.
@@ -64,10 +68,10 @@ induction l.
       exact IHl.
 Qed.
 
-Lemma split_p_snd : forall (A : Type) (p : A -> bool) (l l1 l2 : list A) x,
+Lemma split_p_snd : forall (p : A -> bool) (l l1 l2 : list A) x,
 split_p p l = (l1, l2) -> head l2 = Some x -> p x = true.
 Proof.
-intros A p l.
+intros p l.
 induction l as [| a l' IHl'].
 - intros l1 l2 x Hsplit Hhead.
   simpl in Hsplit.
@@ -92,10 +96,10 @@ Qed.
 
 
 
-Lemma split_p_forall : forall (A : Type) (p : A -> bool) (l : list A),
+Lemma split_p_forall : forall (p : A -> bool) (l : list A),
 Forall (fun x => p x = true) l -> split_p p l = ([], l).
 Proof.
-intros A p. induction l.
+intros p. induction l.
 - intros _. simpl. reflexivity.
 - intro Hyp.
   simpl. 
@@ -111,9 +115,9 @@ intros A p. induction l.
       discriminate Pa.
 Qed.
 
-Lemma split_p_forall_left : forall (A : Type) (p : A -> bool) (l : list A),
+Lemma split_p_forall_left : forall (p : A -> bool) (l : list A),
 Forall (fun x => p x = false) l -> split_p p l = (l, []).
-Proof. intros A p. induction l.
+Proof. intros p. induction l.
 - intro Hyp. simpl. reflexivity.
 - intro Hyp. simpl. case (p a)eqn:Pa.
   + assert (p a = false) as PaFalse. {
@@ -134,10 +138,10 @@ Proof. intros A p. induction l.
     reflexivity.
 Qed.
 
-Lemma split_p_append: forall (A: Type) (p: A -> bool) (l left right: list A),
+Lemma split_p_append: forall (p: A -> bool) (l left right: list A),
 split_p p l = (left, right) -> l = app left right.
 Proof.
-intros A p. induction l.
+intros p. induction l.
 - intros l r SplitHyp. simpl in SplitHyp. 
   injection SplitHyp as HL HR.
   rewrite <- HL.
@@ -164,9 +168,9 @@ Qed.
 
 Require Import Lia.
 
-Lemma split_p_length: forall (A: Type) (p: A -> bool) (l left right: list A),
+Lemma split_p_length: forall (p: A -> bool) (l left right: list A),
 split_p p l = (left, right) -> length left <= length l /\ length right <= length l.
-intros A p. induction l.
+intros p. induction l.
 - intros left right SplitHyp.
   simpl in SplitHyp.
   injection SplitHyp as LEmpty REmpty.
@@ -204,22 +208,22 @@ intros A p. induction l.
       assumption.
 Qed.
 
-Require Import Coq.Classes.EquivDec.
-Require Import Coq.Bool.Bool.
+Require Import Stdlib.Classes.EquivDec.
+Require Import Stdlib.Bool.Bool.
 
 
-Definition split_occ {A: Type} (eq_dec: forall (x y : A), {x=y}+{~x=y}) (v: A) (l: list A) :=
-  split_p (fun x => if eq_dec x v then true else false) l.
+Definition split_occ (v: A) (l: list A) :=
+  split_p (fun x => if A_eq_dec x v then true else false) l.
 
-Lemma split_occ_first: forall (A: Type) (eq_dec: forall (x y : A), {x=y}+{~x=y}) (v: A) (l: list A),
-Forall (fun x => ~(x = v)) (fst (split_occ eq_dec v l)). 
+Lemma split_occ_first: forall (v: A) (l: list A),
+Forall (fun x => ~(x = v)) (fst (split_occ v l)). 
 Proof.
-intros A eq_dec v.
+intros v.
 induction l.
 - simpl. apply Forall_nil.
 - unfold split_occ.
   simpl.
-  destruct (eq_dec a v) eqn:HAV.
+  destruct (A_eq_dec a v) eqn:HAV.
   + simpl. apply Forall_nil.
   + destruct split_p as [Left Right] eqn: Hsplit.
     unfold split_occ in IHl.
@@ -231,24 +235,17 @@ induction l.
     * exact IHl.
 Qed.
 
-Definition mem {A : Type} (eq_dec: forall (x y : A), {x=y}+{~x=y}) (x : A) (l : list A) : bool :=
-  existsb (fun v => if eq_dec x v then true else false) l.
-
-
-
 Lemma split_occ_snd_starts_with_v: forall 
-  (A: Type) 
-  (eq_dec: forall (x y : A), {x=y}+{~x=y}) 
   (v: A) (l: list A), 
-    snd (split_occ eq_dec v l) = [] \/ (exists (l': list A), snd(split_occ eq_dec v l) = v :: l').
+    snd (split_occ v l) = [] \/ (exists (l': list A), snd(split_occ v l) = v :: l').
 Proof.
-  intros A eq_dec v l.
+  intros v l.
   unfold split_occ.
   induction l.
   - simpl. left. reflexivity.
-  - simpl. destruct (eq_dec a v) eqn:Hav.
+  - simpl. destruct (A_eq_dec a v) eqn:Hav.
     + right. exists l. rewrite e. reflexivity.
-    + destruct (split_p (fun x => if eq_dec x v then true else false) l) eqn:Hsplit.
+    + destruct (split_p (fun x => if A_eq_dec x v then true else false) l) eqn:Hsplit.
       exact IHl.
 Qed.
       
