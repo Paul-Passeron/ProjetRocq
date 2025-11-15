@@ -1,7 +1,7 @@
 Require Import List.
 Import ListNotations.
 
-Require Import Stdlib.Arith.PeanoNat.
+Require Import Coq.Arith.PeanoNat.
 Import Nat.
 
 Parameter A: Type.
@@ -208,8 +208,8 @@ intros p. induction l.
       assumption.
 Qed.
 
-Require Import Stdlib.Classes.EquivDec.
-Require Import Stdlib.Bool.Bool.
+Require Import Coq.Classes.EquivDec.
+Require Import Coq.Bool.Bool.
 
 
 Definition split_occ (v: A) (l: list A) :=
@@ -325,7 +325,8 @@ Lemma singleton_wf: forall x: T, wf (singleton x) = True.
 Proof.
   intro x.
   simpl.
-  apply proj1 ((forall y : T, nat -> False -> y <> x)).
+  (*apply proj1 ((forall y : T, nat -> False -> y <> x)).*)
+  Abort.
 
 (* question 3 *)
 Lemma x_not_in_empty : forall x, ~ InMultiset x empty.
@@ -356,3 +357,65 @@ Proof.
   -reflexivity.
   -contradiction.
 Qed.
+
+
+Lemma prop_4 : forall x s, wf s -> (member x s = true <-> InMultiset x s).
+Proof.
+  intros.
+  split.
+  - unfold InMultiset. intro. exact H0.
+  - unfold InMultiset. intro. exact H0.
+Qed.
+
+
+Lemma prop_5 : forall x n s, n > 0 -> InMultiset x (add x n s).
+Proof.
+  intros.
+  unfold InMultiset.
+  induction s as [| [y k] s' IH].
+  - simpl.
+    destruct (T_eq_dec x x) as [Heq|Hneq].
+    + reflexivity.
+    + contradiction.
+  - simpl.
+    destruct (T_eq_dec y x) as [Heq | Hneq].
+    + subst.
+      simpl.
+      destruct (T_eq_dec x x) as [Heq|Hneq].
+      * reflexivity.
+      * contradiction.
+    + simpl.
+      destruct (T_eq_dec y x) as [Heq2|Hneq2].
+      * contradiction.
+      * apply IH.
+Qed.
+
+Lemma prop_6 : forall x y n s, x <> y -> (InMultiset y (add x n s) <-> InMultiset y s).
+Proof.
+  intros.
+  split.
+  - destruct (T_eq_dec x y) as [Heq|Hn].
+    + contradiction.
+    + intro. 
+Abort.
+
+
+
+Lemma prop_7 : forall x s, wf s -> (multiplicity x s = 0 <-> ~InMultiset x s).
+Proof.
+  intros.
+  split.
+  - intro. unfold InMultiset. 
+Abort.
+
+
+Lemma prop_8 : forall x n s, multiplicity x (add x n s) = n + (multiplicity x s).
+Proof.
+  intros.
+Abort.
+
+
+Lemma prop_9 : forall x n y s, x <> y -> wf s -> multiplicity y (add x n s) = multiplicity y s.
+Proof.
+Abort.
+
