@@ -416,7 +416,7 @@ Qed.
 
 Lemma prop_5 : forall x n s, n > 0 -> InMultiset x (add x n s).
 Proof.
-  intros x n s Hn.
+  intros.
   unfold InMultiset.
   destruct n as [| n'].
   - lia.
