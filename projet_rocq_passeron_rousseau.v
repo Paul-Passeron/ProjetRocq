@@ -32,7 +32,7 @@ induction n.
 - simpl. rewrite IHn. reflexivity.
 Qed.
 
-Fixpoint split_p_aux (p: A -> bool) (l: list A) (acc: list A) := 
+Fixpoint split_p_aux (p: A -> bool) (l: list A) (acc: list A) :=
 match l with
   | [] => (acc, [])
   | head::tail => match p head with
@@ -60,8 +60,8 @@ induction l.
 -simpl. apply Forall_nil.
 - simpl. case (p a) eqn:Ha.
   + simpl. apply Forall_nil.
-  + destruct (split_p p l) eqn:Hsplit. 
-    simpl. 
+  + destruct (split_p p l) eqn:Hsplit.
+    simpl.
     apply Forall_cons.
     * exact Ha.
     * simpl in IHl.
@@ -82,7 +82,7 @@ induction l as [| a l' IHl'].
     simpl in Hsplit.
     destruct (p a)eqn:Pa.
     + injection Hsplit as Hl1 Hl2.
-      rewrite <- Hl2 in Hhead. 
+      rewrite <- Hl2 in Hhead.
       simpl in Hhead.
       inversion Hhead as [AeqX].
       rewrite <- AeqX.
@@ -102,13 +102,13 @@ Proof.
 intros p. induction l.
 - intros _. simpl. reflexivity.
 - intro Hyp.
-  simpl. 
+  simpl.
   destruct (p a) eqn:Pa.
   + reflexivity.
-  + destruct (split_p p l). 
+  + destruct (split_p p l).
     rewrite Forall_forall in Hyp.
-    specialize (Hyp a). 
-    simpl in Hyp. 
+    specialize (Hyp a).
+    simpl in Hyp.
     assert (p a = true) as PaTrue.
     * apply Hyp. left. reflexivity.
     * rewrite PaTrue in Pa.
@@ -133,7 +133,7 @@ Proof. intros p. induction l.
     inversion Hyp.
     apply IHl in H2.
     injection H2 as HLeft HRight.
-    rewrite HLeft. 
+    rewrite HLeft.
     rewrite HRight.
     reflexivity.
 Qed.
@@ -142,7 +142,7 @@ Lemma split_p_append: forall (p: A -> bool) (l left right: list A),
 split_p p l = (left, right) -> l = app left right.
 Proof.
 intros p. induction l.
-- intros l r SplitHyp. simpl in SplitHyp. 
+- intros l r SplitHyp. simpl in SplitHyp.
   injection SplitHyp as HL HR.
   rewrite <- HL.
   rewrite <- HR.
@@ -150,8 +150,8 @@ intros p. induction l.
 - intros left right SplitHyp.
   simpl in SplitHyp.
   destruct (p a) eqn:Pa.
-  + injection SplitHyp as Empty Al. 
-    rewrite <-Empty. 
+  + injection SplitHyp as Empty Al.
+    rewrite <-Empty.
     rewrite <- Al.
     reflexivity.
   + destruct (split_p p l) as [Left Right] eqn:Hsplit.
@@ -159,8 +159,8 @@ intros p. induction l.
     assert (l = Left ++ Right).
     * apply IHl. reflexivity.
     * injection SplitHyp as ALeft RRight.
-      rewrite <- RRight. 
-      rewrite <- ALeft. 
+      rewrite <- RRight.
+      rewrite <- ALeft.
       simpl.
       rewrite <- H.
       reflexivity.
@@ -181,7 +181,7 @@ intros p. induction l.
   simpl.
   destruct (p a) eqn:Pa.
   + intro H.
-    split; injection H as LEmpty ReqAL. 
+    split; injection H as LEmpty ReqAL.
     * rewrite <- LEmpty.
       simpl.
       lia.
@@ -189,12 +189,12 @@ intros p. induction l.
       simpl.
       lia.
   + destruct (split_p p l) as [Left Right] eqn: HSplit.
-    intro H. injection H as LeqAL REmpty. 
+    intro H. injection H as LeqAL REmpty.
     specialize (IHl Left Right).
     assert(length Left <= length l /\
     length Right <= length l) as Rec.
       {
-        apply IHl. 
+        apply IHl.
         reflexivity.
       }
     destruct Rec as [RL RR].
@@ -216,7 +216,7 @@ Definition split_occ (v: A) (l: list A) :=
   split_p (fun x => if A_eq_dec x v then true else false) l.
 
 Lemma split_occ_first: forall (v: A) (l: list A),
-Forall (fun x => ~(x = v)) (fst (split_occ v l)). 
+Forall (fun x => ~(x = v)) (fst (split_occ v l)).
 Proof.
 intros v.
 induction l.
@@ -235,8 +235,8 @@ induction l.
     * exact IHl.
 Qed.
 
-Lemma split_occ_snd_starts_with_v: forall 
-  (v: A) (l: list A), 
+Lemma split_occ_snd_starts_with_v: forall
+  (v: A) (l: list A),
     snd (split_occ v l) = [] \/ (exists (l': list A), snd(split_occ v l) = v :: l').
 Proof.
   intros v l.
@@ -248,7 +248,7 @@ Proof.
     + destruct (split_p (fun x => if A_eq_dec x v then true else false) l) eqn:Hsplit.
       exact IHl.
 Qed.
-      
+
 (* Exercice 2 *)
 (* Multi ensembles *)
 
@@ -265,30 +265,30 @@ Definition empty : multiset := ([]).
 (* (*Count starts at 0 so that there is no room for invalid (a, 0) tuples*)
 Definition singleton (x: T) : multiset := [(x, 0)]. *)
 
-Definition singleton (t:T) : multiset := [(t,1)].
+Definition singleton (t:T) : multiset := [(t,0)].
 
-Fixpoint member (t:T) (m:multiset) : bool := match m with 
-  |[] => false 
+Fixpoint member (t:T) (m:multiset) : bool := match m with
+  |[] => false
   |(x,_)::m' => if T_eq_dec x t then true
                 else member t m'
 end.
 
 Fixpoint add (t:T) (n:nat) (m:multiset) : multiset := match m with
-  |[] => [(t,n)]
+  |[] => [(t,n - 1)]
   |(x,xn)::m' => if T_eq_dec x t then (x,xn+n)::m'
                  else (x,xn)::(add t n m')
 end.
 
 Fixpoint multiplicity (t:T) (m:multiset) : nat := match m with
   |[] => 0
-  |(x,xn)::m' => if T_eq_dec x t then xn
+  |(x,xn)::m' => if T_eq_dec x t then xn + 1
                  else multiplicity t m'
 end.
 
 Fixpoint removeOne (t:T) (m:multiset) : multiset := match m with
   |[] => []
   |(x,xn)::m' => if T_eq_dec x t then
-                     if xn=?1 then m'
+                     if xn=?0 then m'
                      else (x,xn-1)::m'
                  else (x,xn)::(removeOne t m')
 end.
@@ -303,9 +303,30 @@ end.
 Definition InMultiset (t:T) (m:multiset) : Prop := (member t m) = true.
 
 (* question 2b *)
-(*Definition wf (t:T) (m:multiset) : Prop := (member t m) -> (member t (removeAll t m))=false.*)
+Fixpoint wf (m: multiset) : Prop :=
+  match m with
+  | [] => True
+  | (x, n) :: m' =>
+      (* x ne doit pas apparaître dans m' *)
+      (forall y occ, In (y, occ) m' -> y <> x) /\
+      (* le reste de la liste doit aussi être bien formé *)
+      wf m'
+  end.
 
 (* question 2c *)
+
+Lemma empty_wf: wf empty = True.
+Proof.
+  simpl.
+  reflexivity.
+Qed.
+
+Lemma singleton_wf: forall x: T, wf (singleton x) = True.
+Proof.
+  intro x.
+  simpl.
+  apply proj1 ((forall y : T, nat -> False -> y <> x)).
+
 (* question 3 *)
 Lemma x_not_in_empty : forall x, ~ InMultiset x empty.
 Proof.
@@ -320,8 +341,8 @@ Proof.
   destruct (T_eq_dec x y) as [Heq | Hneq].
   -split.
     +intros. exact Heq.
-    +intros. reflexivity. 
-  -split. 
+    +intros. reflexivity.
+  -split.
     +intros. discriminate H.
     +intros. contradiction.
 Qed.
