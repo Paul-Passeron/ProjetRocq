@@ -410,9 +410,7 @@ Qed.
 Lemma prop_4 : forall x s, wf s -> (member x s = true <-> InMultiset x s).
 Proof.
   intros.
-  split.
-  - unfold InMultiset. intro. exact H0.
-  - unfold InMultiset. intro. exact H0.
+  split; unfold InMultiset; intro; exact H0.
 Qed.
 
 
