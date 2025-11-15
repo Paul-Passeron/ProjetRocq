@@ -337,7 +337,19 @@ Proof.
     + intros y n contr.
       contradiction.
     + exact H.
-Qed.  
+Qed.
+
+Lemma add_wf: forall (x: T) (n: nat) (s: multiset) , wf s -> wf (add x n s).
+Proof.
+Admitted.
+
+Lemma removeOne_wf: forall (s: multiset) (x: T), wf s -> wf (removeOne x s).
+Proof.
+Admitted.
+
+Lemma removeAll_wf: forall (s: multiset) (x: T), wf s -> wf (removeAll x s).
+Proof.
+Admitted.
 
 
 (* question 3 *)
