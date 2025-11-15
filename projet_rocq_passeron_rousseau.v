@@ -421,19 +421,15 @@ Proof.
   intros.
   unfold InMultiset.
   induction s as [| [y k] s' IH].
-  - simpl.
-    destruct (T_eq_dec x x) as [Heq|Hneq].
+  - simpl. destruct (T_eq_dec x x) as [Heq|Hneq].
     + reflexivity.
     + contradiction.
-  - simpl.
-    destruct (T_eq_dec y x) as [Heq | Hneq].
+  - simpl. destruct (T_eq_dec y x) as [Heq | Hneq].
     + subst.
-      simpl.
-      destruct (T_eq_dec x x) as [Heq|Hneq].
+      simpl. destruct (T_eq_dec x x) as [Heq|Hneq].
       * reflexivity.
       * contradiction.
-    + simpl.
-      destruct (T_eq_dec y x) as [Heq2|Hneq2].
+    + simpl. destruct (T_eq_dec y x) as [Heq2|Hneq2].
       * contradiction.
       * apply IH.
 Qed.
@@ -444,22 +440,47 @@ Proof.
   split.
   - destruct (T_eq_dec x y) as [Heq|Hn].
     + contradiction.
-    + intro. 
-Abort.
+    + intro.
+Admitted.
+
+(*Lemma prop_7_aux : forall x n s, In (x,n) s -> wf s -> n >= 1.
+Proof.
+  intros.
+  induction s as [| [y m] s' IH].
+  - simpl in H. contradiction. 
+  - simpl in H. destruct H0 as [Hn [Hh1 Hh2]]. simpl in Hn. simpl in *. destruct H as [Heq | Hin']. 
+    + inversion Heq. subst. exact Hn.
+    + apply IH; assumption.
+Qed.*)
+
 
 Lemma prop_7 : forall x s, wf s -> (multiplicity x s = 0 <-> ~InMultiset x s).
 Proof.
   intros.
   split.
-  - intro. unfold InMultiset. 
-Abort.
+  - intro. unfold not, InMultiset. intro. induction s as [| [y n] s' IH].
+    + simpl in H0, H1. discriminate.
+    + simpl in H0, H1. destruct (T_eq_dec y x) as [Heq | Hneq].
+      * destruct H as [Hn [Hh1 Hh2]]. lia.
+      * apply IH. destruct H as [Hn [Hh1 Hh2]].
+        -- apply Hh2.  
+        -- apply H0.
+        -- apply H1.
+  - intro. induction s as [| [y n] s' IH].
+    + simpl. reflexivity.
+    + simpl. destruct (T_eq_dec y x) as [Heq | Hneq].
+      * subst y. destruct H as [Hn [Hh1 Hh2]].
+Admitted.
+
 
 Lemma prop_8 : forall x n s, multiplicity x (add x n s) = n + (multiplicity x s).
 Proof.
   intros.
-Abort.
+Admitted.
+
 
 Lemma prop_9 : forall x n y s, x <> y -> wf s -> multiplicity y (add x n s) = multiplicity y s.
 Proof.
-Abort.
+Admitted.
+
 
