@@ -345,6 +345,7 @@ Proof.
       * exact H.
 Qed.
 
+
 Lemma add_wf: forall (x: T) (n: nat) (s: multiset) , wf s -> wf (add x n s).
 Proof.
   intros x n.
@@ -364,8 +365,48 @@ Proof.
         --  simpl in H.
             exact H.
   - intro Hn.
-Abort.     
-      
+    destruct a.
+    unfold add.
+    destruct n.
+    + simpl.
+      unfold wf in Hn.
+      assert (n_gt_0:= proj1 Hn). 
+      assert (f_all:= proj1 (proj2 Hn)).
+      apply proj2 in Hn.
+      apply proj2 in Hn.
+      split .
+      assumption.
+      split .
+      assumption.
+      unfold wf.
+      assumption.
+    + simpl.
+      destruct (T_eq_dec t0 x).
+      * unfold wf in Hn.
+        assert (n_gt_0:= proj1 Hn). 
+        assert (f_all:= proj1 (proj2 Hn)).
+        apply proj2 in Hn.
+        apply proj2 in Hn.
+        unfold wf.
+        split .
+        --  lia.
+        --  split.
+            ++ assumption.
+            ++ assumption.
+      * unfold wf in Hn.
+        assert (n_gt_0:= proj1 Hn). 
+        assert (f_all:= proj1 (proj2 Hn)).
+        apply proj2 in Hn.
+        apply proj2 in Hn.
+        unfold wf.
+        split.
+        assumption.
+        split.
+        -- admit. 
+        -- fold wf.
+           apply IHs in Hn.
+           exact Hn.
+Admitted.
 
 Lemma removeOne_wf: forall (s: multiset) (x: T), wf s -> wf (removeOne x s).
 Proof.
