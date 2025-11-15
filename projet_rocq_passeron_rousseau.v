@@ -402,10 +402,19 @@ Proof.
         split.
         assumption.
         split.
-        -- admit. 
-        -- fold wf.
-           apply IHs in Hn.
-           exact Hn.
+        --  fold add.
+            intros.
+            fold wf in Hn.
+            apply IHs in Hn.
+            destruct (add x (S n) s).
+            ++  inversion H.
+            ++  destruct p.
+                unfold wf in Hn.
+                apply proj2 in Hn.
+                admit.
+        --  fold wf.
+            apply IHs in Hn.
+            exact Hn.
 Admitted.
 
 Lemma removeOne_wf: forall (s: multiset) (x: T), wf s -> wf (removeOne x s).
