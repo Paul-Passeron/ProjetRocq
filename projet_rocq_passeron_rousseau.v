@@ -430,8 +430,8 @@ Proof.
         split.
         lia.
         split.
-        --  admit.
-        --  exact (IH (Hwf_s')).
+        -- admit.
+        -- exact (IH (Hwf_s')).
     + intro Han. 
       assert (an <> 1).
       assumption.
@@ -442,7 +442,7 @@ Proof.
         split.
         lia.
         split.
-        -- admit.
+        -- exact Hnot_in_s'.
         -- exact Hwf_s'.
 Admitted.
 
