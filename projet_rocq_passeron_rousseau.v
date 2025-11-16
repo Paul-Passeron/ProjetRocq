@@ -485,12 +485,25 @@ Qed.
 
 
 Lemma prop_6 : forall x y n s, x <> y -> (InMultiset y (add x n s) <-> InMultiset y s).
+(*Proof.
+  intros.
+  split.
+  - unfold InMultiset. intro.
+Admitted.*)
 Proof.
   intros.
   split.
-  - destruct (T_eq_dec x y) as [Heq|Hn].
-    + contradiction.
-    + intro.
+    - intro. induction s as [| [z k] s' IH]. destruct n.
+      + simpl in H0. exact H0.
+      + simpl in H0. assert (Hnz : S n <> 0) by discriminate. destruct (T_eq_dec x y) as [Heq | Hneq].
+        * contradiction.
+        * admit.
+      + destruct (T_eq_dec x y) as [Heq | Hneq].
+        * contradiction.
+        * admit.
+    - intro. induction s as [| [z k] s' IH]. destruct n.
+      + simpl. exact H0.
+      + unfold InMultiset. unfold InMultiset in H0.
 Admitted.
 
 (*Lemma prop_7_aux : forall x n s, In (x,n) s -> wf s -> n >= 1.
@@ -526,11 +539,56 @@ Admitted.
 Lemma prop_8 : forall x n s, multiplicity x (add x n s) = n + (multiplicity x s).
 Proof.
   intros.
-Admitted.
+  induction s as [| [y k] s' IH].
+  - simpl. destruct n.
+    + simpl. reflexivity.
+    + simpl. destruct (T_eq_dec x x) as [Heq | Hneq].
+      * lia.
+      * contradiction.
+  - destruct n.
+    + simpl. reflexivity.
+    + simpl. destruct (T_eq_dec y x) as [Heq | Hneq].
+      * subst y. simpl. destruct (T_eq_dec x x) as [Heq | Hneq].
+        -- lia.
+        -- contradiction.
+      * simpl. destruct (T_eq_dec y x).
+        -- contradiction.
+        -- rewrite IH. reflexivity.
+Qed.
 
 
 Lemma prop_9 : forall x n y s, x <> y -> wf s -> multiplicity y (add x n s) = multiplicity y s.
 Proof.
+  intros x n y s Hxy Hwf. revert n. revert x y Hxy. induction s as [| [z k] s' IH]; intros.
+  - simpl. destruct n.
+    + reflexivity.
+    + simpl.
+      destruct (T_eq_dec x y) as [Heq | Hneq].
+      * contradiction.
+      * simpl. reflexivity.
+  - simpl in Hwf. destruct Hwf as [Hk_pos [Hnot_in_s' Hwf_s']]. simpl. destruct n as [| n'].
+    + simpl. destruct (T_eq_dec z y) as [Heq1 | Hneq1].
+      * subst. destruct (T_eq_dec y x) as [Heq2 | Hneq2].
+        -- symmetry in Heq2. contradiction.
+        -- simpl. reflexivity.
+      * destruct (T_eq_dec z y).
+        -- contradiction.
+        -- admit.
+    + simpl. destruct (T_eq_dec z x) as [Heq | Hneq].
+      * subst. destruct (T_eq_dec x y) as [Heq2 | Hneq2].
+        -- contradiction.
+        -- simpl. destruct (T_eq_dec x y) as [Heq | Hneq].
+          ++ contradiction.
+          ++ reflexivity.
+      * destruct (T_eq_dec z y) as [Heq2 | Hneq2].
+        -- subst. simpl. destruct (T_eq_dec x y) as [Heq2 | Hneq2].
+          ++ contradiction.
+          ++ destruct (T_eq_dec y y) as [Heq3 | Hneq3].
+            ** reflexivity.
+            ** admit.
+        -- simpl. destruct (T_eq_dec z y) as [Heq3 | Hneq3].
+          ++ contradiction.
+          ++ admit.
 Admitted.
 
 
