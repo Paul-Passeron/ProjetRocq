@@ -387,6 +387,11 @@ Proof.
   - exact I.
 Qed.
 
+Lemma not_in_after_remove:
+  forall (x y: T) (s: multiset), x <> y -> wf s -> 
+  (forall (z: T) (occ: nat), In (y, occ) s -> z <> x) -> 
+  (forall (z: T) (occ: nat), In (y, occ) (removeOne y s) -> z <> x) -> 
+
 Lemma add_wf: forall (x: T) (n: nat) (s: multiset), wf s -> wf (add x n s).
 Proof.
   intros x n s Hwf.
@@ -412,6 +417,8 @@ Proof.
            ++ exact Hnot_in_s'.
         -- apply IH. exact Hwf_s'.
 Qed.
+
+
 
 
 Lemma removeOne_wf: forall (s: multiset) (x: T), wf s -> wf (removeOne x s).
