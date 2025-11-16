@@ -346,106 +346,80 @@ Proof.
 Qed.
 
 
-
-(* Helper lemma: if x doesn't appear in a well-formed list, 
-   then it doesn't appear after adding a different element *)
-Lemma not_in_after_add_different : 
-  forall x y n s, x <> y -> wf s -> 
-  (forall z occ, In (z, occ) s -> z <> x) ->
-  (forall z occ, In (z, occ) (add y n s) -> z <> x).
+Lemma add_wf: forall (x: T) (n: nat) (s: multiset) , wf s -> wf (add x n s).
 Proof.
-  intros x y n s Hxy Hwf Hnot_in.
-  induction s as [| [a an] s' IH].
-  - simpl. destruct n.
-    + intros z occ Hin. apply (Hnot_in z occ Hin).
-    + simpl. intros z occ Hin.
-      destruct Hin as [Heq | Hcontra].
-      * inversion Heq. subst. symmetry. exact Hxy.
-      * inversion Hcontra.
-  - simpl in Hwf. 
-    destruct Hwf as [Han_pos [Hnot_in_s' Hwf_s']].
-    simpl. destruct n.
-    + simpl. intros z occ Hin. apply (Hnot_in z occ Hin).
-    + simpl. destruct (T_eq_dec a y) as [Hay | Hnay].
-      * subst a. intros z occ [Heq | Hin'].
-        -- inversion Heq. subst. symmetry. exact Hxy.
-        -- apply (Hnot_in z occ). right. exact Hin'.
-      * intros z occ [Heq | Hin'].
-        -- inversion Heq. subst. 
-           apply (Hnot_in z occ). left. reflexivity.
-        -- apply (IH Hwf_s' 
-          (fun w wocc Hw => Hnot_in w wocc (or_intror Hw)) z occ Hin').
-Qed.
-
-(* When adding to*)
-Lemma add_to_empty_wf : forall x n, n > 0 -> wf [(x, n)].
-Proof.
-  intros x n Hn.
-  simpl.
-  split; [exact Hn | split].
-  - intros y occ Hin. inversion Hin.
-  - exact I.
-Qed.
-
-Lemma add_wf: forall (x: T) (n: nat) (s: multiset), wf s -> wf (add x n s).
-Proof.
-  intros x n s Hwf.
-  induction s as [| [a an] s' IH].
-  - simpl. destruct n.
-    + simpl. exact Hwf.
-    + simpl. apply add_to_empty_wf. lia.
-  - simpl in Hwf.
-    destruct Hwf as [Han_pos [Hnot_in_s' Hwf_s']].
-    simpl. destruct n.
-    + simpl. split; [exact Han_pos | split; [exact Hnot_in_s' | exact Hwf_s']].
-    + simpl. destruct (T_eq_dec a x) as [Hax | Hnax].
-      * subst a. simpl.
-        split; [lia | split].
-        -- exact Hnot_in_s'.
-        -- exact Hwf_s'.
-      * simpl. split; [exact Han_pos | split].
-        -- intros y occ Hin_add.
-           apply not_in_after_add_different with (x := a) (y := x) (n := S n) (s := s') in Hin_add.
-           ++ exact Hin_add.
-           ++ exact Hnax.
-           ++ exact Hwf_s'.
-           ++ exact Hnot_in_s'.
-        -- apply IH. exact Hwf_s'.
-Qed.
-
+  intros x n.
+  induction s.
+  intro H.
+  - simpl.
+    destruct n.
+    + simpl.
+      simpl in H.
+      exact H.
+    + simpl.
+      split.
+      * lia.
+      * split.
+        --  intros y n' contr.
+            contradiction.
+        --  simpl in H.
+            exact H.
+  - intro Hn.
+    destruct a.
+    unfold add.
+    destruct n.
+    + simpl.
+      unfold wf in Hn.
+      assert (n_gt_0:= proj1 Hn). 
+      assert (f_all:= proj1 (proj2 Hn)).
+      apply proj2 in Hn.
+      apply proj2 in Hn.
+      split .
+      assumption.
+      split .
+      assumption.
+      unfold wf.
+      assumption.
+    + simpl.
+      destruct (T_eq_dec t0 x).
+      * unfold wf in Hn.
+        assert (n_gt_0:= proj1 Hn). 
+        assert (f_all:= proj1 (proj2 Hn)).
+        apply proj2 in Hn.
+        apply proj2 in Hn.
+        unfold wf.
+        split .
+        --  lia.
+        --  split.
+            ++ assumption.
+            ++ assumption.
+      * unfold wf in Hn.
+        assert (n_gt_0:= proj1 Hn). 
+        assert (f_all:= proj1 (proj2 Hn)).
+        apply proj2 in Hn.
+        apply proj2 in Hn.
+        unfold wf.
+        split.
+        assumption.
+        split.
+        --  fold add.
+            intros.
+            fold wf in Hn.
+            apply IHs in Hn.
+            destruct (add x (S n) s).
+            ++  inversion H.
+            ++  destruct p.
+                unfold wf in Hn.
+                apply proj2 in Hn.
+                admit.
+        --  fold wf.
+            apply IHs in Hn.
+            exact Hn.
+Admitted.
 
 Lemma removeOne_wf: forall (s: multiset) (x: T), wf s -> wf (removeOne x s).
 Proof.
-  intros s x Hwf.
-  induction s as [| [a an] s' IH].
-  - simpl in *. exact Hwf.
-  - simpl in Hwf. destruct Hwf as [Han_pos [Hnot_in_s' Hwf_s']].
-    simpl.
-    case (an == 1).
-    + intro Han. rewrite Han.
-      simpl.
-      destruct (T_eq_dec a x) as [Hax | Hnax].
-      * exact Hwf_s'.
-      * simpl.
-        split.
-        lia.
-        split.
-        --  admit.
-        --  exact (IH (Hwf_s')).
-    + intro Han. 
-      assert (an <> 1).
-      assumption.
-      destruct (T_eq_dec a x) as [Hax | Hnax].
-      * assert(rewH:= H). rewrite <- Nat.eqb_neq in rewH.
-        rewrite rewH.
-        simpl.
-        split.
-        lia.
-        split.
-        -- admit.
-        -- exact Hwf_s'.
 Admitted.
-
 
 Lemma removeAll_wf: forall (s: multiset) (x: T), wf s -> wf (removeAll x s).
 Proof.
@@ -541,6 +515,9 @@ Proof.
     + inversion Heq. subst. exact Hn.
     + apply IH; assumption.
 Qed.*)
+
+
+Search (?a <> ?b) (?b <> ?a).
 
 
 Lemma prop_7 : forall x s, wf s -> (multiplicity x s = 0 <-> ~InMultiset x s).
