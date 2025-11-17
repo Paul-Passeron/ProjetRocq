@@ -991,8 +991,41 @@ Lemma multiplicity_removeOne_neq:
   forall x y s, wf s -> x <> y ->
   multiplicity y (removeOne x s) = multiplicity y s.
 Proof.
-Admitted.
-
+  intros x y s Hwfs Hxy.
+  induction s.
+  simpl.
+  reflexivity.
+  destruct a as [a an].
+  simpl.
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  - subst x.
+    destruct (an == 1) as [Han | Han].
+    + rewrite Han.
+      simpl.
+      assert (an = 1).
+      assumption.
+      subst an.
+      destruct (T_eq_dec a y).
+      subst y.
+      contradiction.
+      reflexivity.
+    + assert (Hd: an <> 1).
+      assumption.
+      assert(H' := Hd).
+      apply Nat.eqb_neq in H'.
+      rewrite H'.
+      simpl.
+      destruct (T_eq_dec a y).
+      subst y.
+      contradiction.
+      reflexivity.
+  - simpl.
+    destruct (T_eq_dec a y).
+    reflexivity.
+    destruct Hwfs as [_ [ _ Hwfs]].
+    exact (IHs Hwfs).
+Qed.
+      
 (* InMultiset après removeOne si multiplicité > 1 *)
 Lemma InMultiset_removeOne_still_in:
   forall x s, wf s -> multiplicity x s > 1 ->
