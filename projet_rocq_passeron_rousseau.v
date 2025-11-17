@@ -266,7 +266,7 @@ Qed.
 
 (** ** Question 4 *)
 
-(** * a) *)
+(** *** a) *)
 
 Fixpoint split_p_all_aux (p : A -> bool) (l : list A) 
   (acc_prefix : list A) (acc_current : option (list A)) (acc_lists : list (list A)) 
@@ -297,7 +297,7 @@ Fixpoint split_p_all_aux (p : A -> bool) (l : list A)
 Definition split_p_all (p : A -> bool) (l : list A) : list A * list (list A) :=
   split_p_all_aux p l [] None [].
 
-(** * b) *)
+(** **** b) *)
 
 Definition all_not_p (p : A -> bool) (l : list A) : Prop :=
   forall x, In x l -> p x = false.
