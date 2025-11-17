@@ -423,8 +423,31 @@ Proof.
         exact H.
         simpl.
         unfold first_true_rest_false.
-        
-        admit.
+        destruct (rev curr ++ [a]) eqn: Hrca.
+        --trivial.
+        --unfold first_true_rest_false in H0.
+          destruct (rev curr) eqn: Hcurr.
+          ++simpl in Hrca.
+            inversion Hrca.
+            split.
+            **subst a0.
+              subst acc_current.
+              admit.
+            ** apply Forall_nil.
+          ++inversion Hrca.
+            subst a1.
+            destruct H0 as [Hpa0 Hpl0].
+            split.
+            exact Hpa0.
+            apply Forall_app.
+            split.
+            exact Hpl0.
+            apply Forall_cons.
+            exact Hpa.
+            apply Forall_nil.
+      * apply IHl.
+        exact H.
+        trivial.
 Admitted.
 
 Theorem split_p_all_lists_Forall :
