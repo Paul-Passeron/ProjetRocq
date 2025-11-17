@@ -1191,7 +1191,24 @@ Lemma multiplicity_removeAll_neq:
   forall x y s, wf s -> x <> y ->
   multiplicity y (removeAll x s) = multiplicity y s.
 Proof.
-Admitted.
+  intros x y s Hwfs Hxy.
+  induction s.
+  simpl.
+  reflexivity.
+  destruct a as [a an].
+  simpl.
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  - destruct (T_eq_dec a y) as [Hay | Hay].
+    subst a. contradiction.
+    subst a.
+    reflexivity.
+  - simpl.
+    destruct (T_eq_dec a y) as [Hay | Hay].
+    subst a.
+    reflexivity.
+    destruct Hwfs as [_ [_ Hwfs]].
+    exact (IHs Hwfs).
+Qed.
 
 (* L'élément n'est plus InMultiset après removeAll *)
 Lemma not_InMultiset_removeAll:
