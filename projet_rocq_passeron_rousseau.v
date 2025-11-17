@@ -1,4 +1,5 @@
 Require Import List.
+
 Import ListNotations.
 
 Require Import Coq.Arith.PeanoNat.
@@ -417,60 +418,52 @@ Lemma not_in_after_remove:
   forall x y s occ, x <> y -> wf s ->
   In (y, occ) s -> In (y, occ) (removeOne x s).
 Proof.
-Admitted.
-
-(* 
-Lemma not_in_after_remove:
-  forall (x y: T) (s: multiset), x <> y -> wf s -> 
-  (forall (z: T) (occ: nat), In (z, occ) s -> z <> x) -> 
-  (forall (z: T) (occ: nat), In (z, occ) (removeOne y s) -> z <> x).
-Proof.
-  intros x y s Hxy Hwf_s Hnot_in.
+  intros x y s occ Hxy Hwfs Hins.
   induction s.
-  - simpl. intros z occ contr. contradiction.
-  - intros z occ.
-    destruct a as [a an].
-    simpl.
-    destruct (T_eq_dec a y) as [Hay | Hnay].
-    + destruct (an == 1) as [Han | Han].
-      * rewrite Han.
-        simpl.
-        intro Hin.
-        assert (H := Hwf_s).
-        unfold wf in H.
-        destruct H as [H0 [H1 H2]].
-        assert (Hzoccin := Hnot_in z occ).
-        simpl in Hzoccin.
-        exact (Hzoccin ((or_intror (A := (a, an) === (z, occ)) (B := In (z, occ) s)) Hin)).
-      * assert (an <> 1).
-        assumption.
-        rewrite <- Nat.eqb_neq in H.
-        rewrite H.
-        intro Hzoccin.
-        subst y.
-        destruct (T_eq_dec a z) as [Haz | Haz].
-        -- subst z.
-           symmetry.
-           exact Hxy.
-        -- simpl in Hzoccin.
-           destruct Hzoccin as [Heq | Hin].
-           injection Heq as H1 H2.
-           contradiction.
-           assert (Hz : In (z, occ) ((a, an) :: s)).
-           simpl.
-           right.
-           assumption.
-           exact ((Hnot_in z occ) Hz).
-    + intro Hzin.
-      destruct Hwf_s as [H0 [H1 H2]].
-
-              
-
-           
-
-
-Admitted. *)
-
+  simpl in *.
+  contradiction.
+  destruct a as [a an].
+  simpl.
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  - subst x.
+    simpl in Hins.
+    destruct Hins as [Hay | Hin].
+    injection Hay as Ha Hb.
+    contradiction.
+    destruct (an == 1) as [Haeq | Haneq].
+    + rewrite Haeq.
+      simpl.
+      exact Hin.
+    + assert (an <> 1). assumption. 
+      apply Nat.eqb_neq in Haneq.
+      rewrite Haneq.
+      simpl. right. exact Hin.
+  - destruct Hwfs as [H0 [H1 H2]].
+    destruct (T_eq_dec y a) as [Hya | Hya].
+    * subst y.
+      destruct (an == occ) as [Hanocc | Hanocc].
+      assert (an = occ).
+      assumption.
+      subst occ.
+      simpl.
+      left.
+      reflexivity.
+      simpl.
+      right.
+      simpl in Hins.
+      destruct Hins as [Hnope | Hin].
+      injection Hnope as Haa.
+      contradiction.
+      exact (IHs H2 Hin).
+    * simpl.
+      right.
+      simpl in Hins.
+      destruct Hins as [Hcontr | Hin].
+      injection Hcontr as Hcontr _.
+      symmetry in Hcontr.
+      contradiction.
+      exact (IHs H2 Hin).
+Qed.
 
 
 Lemma not_in_before_remove:
@@ -494,8 +487,10 @@ Proof.
       destruct (T_eq_dec a x) as [Hax | Hax].
       * exact HIn.
       * assert (y <> a).
-        -- admit.
-        -- simpl in HIn. 
+        -- destruct (T_eq_dec y a).
+          ++ subst y.
+
+        (* -- simpl in HIn.  *)
 Admitted.
 
 Lemma removeOne_wf: forall (s: multiset) (x: T), wf s -> wf (removeOne x s).
@@ -609,12 +604,8 @@ Proof.
 Qed.
 
 
+
 Lemma prop_6 : forall x y n s, x <> y -> (InMultiset y (add x n s) <-> InMultiset y s).
-(*Proof.
-  intros.
-  split.
-  - unfold InMultiset. intro.
-Admitted.*)
 Proof.
   intros.
   split.
@@ -622,10 +613,38 @@ Proof.
       + simpl in H0. exact H0.
       + simpl in H0. assert (Hnz : S n <> 0) by discriminate. destruct (T_eq_dec x y) as [Heq | Hneq].
         * contradiction.
-        * admit.
+        * unfold InMultiset in H0.
+          simpl in H0.
+          destruct (T_eq_dec x y) as [Heq2 | Hneq2].
+          contradiction.
+          discriminate H0.
       + destruct (T_eq_dec x y) as [Heq | Hneq].
         * contradiction.
-        * admit.
+        * unfold InMultiset.
+          simpl.
+          destruct (T_eq_dec z y) as [Hzy | Hzy].
+          reflexivity.
+          simpl in H0.
+          case n as [| Hn].
+          --simpl in H0.
+            unfold InMultiset in H0.
+            simpl in H0.
+            destruct (T_eq_dec z y) as [ Heq | _].
+            ++contradiction.  
+            ++exact H0. 
+          --simpl in H0.
+            destruct (T_eq_dec z x) as [ Hzx | Hzx].
+            ++subst z. 
+              unfold InMultiset in H0.
+              simpl in H0.
+              destruct (T_eq_dec x y) as [Hcontr | _].
+              contradiction.
+              exact H0.
+            ++unfold InMultiset in H0.
+              simpl in H0.
+              destruct (T_eq_dec z y) as [Hcontr | _].
+              contradiction.
+              exact (IH H0).
     - intro. induction s as [| [z k] s' IH]. destruct n.
       + simpl. exact H0.
       + unfold InMultiset. unfold InMultiset in H0.
