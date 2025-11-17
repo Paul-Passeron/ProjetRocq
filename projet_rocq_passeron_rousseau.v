@@ -320,14 +320,35 @@ Lemma split_p_all_aux_prefix_not_p :
   all_not_p p acc_prefix ->
   all_not_p p (fst (split_p_all_aux p l acc_prefix acc_current acc_lists)).
 Proof.
-  intros A p l.
+  intros p l.
   induction l as [| x xs IH].
   intros.
   - simpl.
     case acc_current.
     + intro l.
       simpl.
-Admitted.
+      rewrite <- all_not_p_rev.
+      exact H.
+    + simpl.
+      rewrite <- all_not_p_rev.
+      exact H.
+  - intros.
+    simpl.
+    destruct (p x) eqn:Hpx.
+    * destruct acc_current; apply IH; exact H.
+    * destruct acc_current.
+      --apply IH. exact H.
+      --apply IH.
+        unfold all_not_p.
+        unfold all_not_p in H.
+        intros x0 HIn.
+        destruct (A_eq_dec x x0) as [Hxx0 | Hxx0].
+        subst x0. assumption.
+        simpl in HIn.
+        destruct HIn as [Hcontr | Hr].
+        contradiction.
+        exact (H x0 Hr).
+Qed.
 
 Theorem split_p_all_fst_no_sat_p :
   forall (p : A -> bool) (l : list A),
