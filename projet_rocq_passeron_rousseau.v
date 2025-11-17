@@ -1334,8 +1334,26 @@ Lemma removeAll_not_member:
   forall x s, wf s -> ~ InMultiset x s ->
   removeAll x s = s.
 Proof.
-  
-Admitted.
+  intros x s Hwfs HNotIn.
+  induction s.
+  simpl. reflexivity.
+  destruct a as [a an].
+  simpl.
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  - subst x.
+    unfold InMultiset in *.
+    simpl in HNotIn.
+    destruct (T_eq_dec a a).
+    contradiction.
+    contradiction.
+  - f_equal.
+    unfold InMultiset in *.
+    simpl in HNotIn.
+    destruct (T_eq_dec a x).
+    contradiction.
+    destruct Hwfs as [_ [_ Hwfs]].
+    exact (IHs Hwfs HNotIn).
+Qed.
 
 
 (* removeAll est idempotent *)
@@ -1370,5 +1388,16 @@ Lemma removeOne_not_member:
   forall x s, wf s -> ~ InMultiset x s ->
   removeOne x s = s.
 Proof.
-Admitted.
-
+  intros x s Hwfs HNotIn.
+  induction s.
+  simpl. reflexivity.
+  simpl.
+  destruct a as [a an].
+  unfold InMultiset in *.
+  simpl in HNotIn.
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  contradiction.
+  f_equal.
+  destruct Hwfs as [_ [_ Hwfs]].
+  exact (IHs Hwfs HNotIn).
+Qed.
