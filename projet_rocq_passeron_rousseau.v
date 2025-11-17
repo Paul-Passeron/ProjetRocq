@@ -346,7 +346,6 @@ Proof.
 Qed.
 
 
-
 (* Helper lemma: if x doesn't appear in a well-formed list, 
    then it doesn't appear after adding a different element *)
 Lemma not_in_after_add_different : 
@@ -414,7 +413,13 @@ Proof.
         -- apply IH. exact Hwf_s'.
 Qed.
 
+Lemma not_in_after_remove: 
+  forall x y s occ, x <> y -> wf s ->
+  In (y, occ) s -> In (y, occ) (removeOne x s).
+Proof.
+Admitted.
 
+(* 
 Lemma not_in_after_remove:
   forall (x y: T) (s: multiset), x <> y -> wf s -> 
   (forall (z: T) (occ: nat), In (z, occ) s -> z <> x) -> 
@@ -436,10 +441,35 @@ Proof.
         destruct H as [H0 [H1 H2]].
         assert (Hzoccin := Hnot_in z occ).
         simpl in Hzoccin.
-        
+        exact (Hzoccin ((or_intror (A := (a, an) === (z, occ)) (B := In (z, occ) s)) Hin)).
+      * assert (an <> 1).
+        assumption.
+        rewrite <- Nat.eqb_neq in H.
+        rewrite H.
+        intro Hzoccin.
+        subst y.
+        destruct (T_eq_dec a z) as [Haz | Haz].
+        -- subst z.
+           symmetry.
+           exact Hxy.
+        -- simpl in Hzoccin.
+           destruct Hzoccin as [Heq | Hin].
+           injection Heq as H1 H2.
+           contradiction.
+           assert (Hz : In (z, occ) ((a, an) :: s)).
+           simpl.
+           right.
+           assumption.
+           exact ((Hnot_in z occ) Hz).
+    + intro Hzin.
+      destruct Hwf_s as [H0 [H1 H2]].
+
+              
+
+           
 
 
-Admitted.
+Admitted. *)
 
 
 
@@ -466,10 +496,6 @@ Proof.
       * assert (y <> a).
         -- admit.
         -- simpl in HIn. 
-   
-
-    
-
 Admitted.
 
 Lemma removeOne_wf: forall (s: multiset) (x: T), wf s -> wf (removeOne x s).
@@ -488,8 +514,10 @@ Proof.
         split.
         lia.
         split.
-        -- intros y occ Hin. 
-          apply ((not_in_after_remove a x s' Hnax Hwf_s' Hnot_in_s') y occ Hin).
+        -- intros y occ Hin.
+          destruct (T_eq_dec x y) as [Hxy | Hxy].
+          ++ subst x. symmetry. exact Hnax.
+          ++ exact (Hnot_in_s' y occ (not_in_before_remove x y occ s' Hxy Hwf_s' Hin)).
         -- exact (IH (Hwf_s')).
     + intro Han. 
       assert (an <> 1).
