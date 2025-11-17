@@ -11,6 +11,7 @@ Parameter A: Type.
 
 Parameter A_eq_dec: forall (x y: A), {x=y} + {~x=y}.
 
+(** ** Question 1 *)
 Fixpoint repeat (x: A) (n: nat): list A :=
  match n with
   | 0  => []
@@ -35,6 +36,8 @@ induction n.
 - simpl. rewrite IHn. reflexivity.
 Qed.
 
+(** ** Question 2 *)
+(** *** Question 2.a *)
 Fixpoint split_p_aux (p: A -> bool) (l: list A) (acc: list A) :=
 match l with
   | [] => (acc, [])
@@ -55,6 +58,7 @@ match l with
   end
 end.
 
+(** *** Question 2.b *)
 Lemma split_p_first : forall (p : A -> bool) (l : list A),
 Forall (fun x => p x = false) (fst (split_p p l)) .
 Proof.
@@ -118,6 +122,7 @@ intros p. induction l.
       discriminate Pa.
 Qed.
 
+(** *** Question 2.c *)
 Lemma split_p_forall_left : forall (p : A -> bool) (l : list A),
 Forall (fun x => p x = false) l -> split_p p l = (l, []).
 Proof. intros p. induction l.
@@ -141,6 +146,7 @@ Proof. intros p. induction l.
     reflexivity.
 Qed.
 
+(** *** Question 2.d *)
 Lemma split_p_append: forall (p: A -> bool) (l left right: list A),
 split_p p l = (left, right) -> l = app left right.
 Proof.
@@ -169,6 +175,7 @@ intros p. induction l.
       reflexivity.
 Qed.
 
+(** *** Question 2.e *)
 Require Import Lia.
 
 Lemma split_p_length: forall (p: A -> bool) (l left right: list A),
@@ -211,6 +218,7 @@ intros p. induction l.
       assumption.
 Qed.
 
+(** ** Question 3 *)
 Require Import Coq.Classes.EquivDec.
 Require Import Coq.Bool.Bool.
 
@@ -252,7 +260,11 @@ Proof.
       exact IHl.
 Qed.
 
-(** * Implantation des multi-ensembles *)
+(** ** Question 4 *)
+
+(** TODO *)
+
+(** * Partie 2 : Implantation des multi-ensembles *)
 
 Parameter T : Type.
 
