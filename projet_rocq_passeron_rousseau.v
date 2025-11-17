@@ -268,51 +268,32 @@ Qed.
 
 (** * a) *)
 
-(* Fonction qui collecte les éléments jusqu'au prochain qui satisfait p (exclus) *)
-Fixpoint collect_until {A : Type} (p : A -> bool) (l : list A) : list A * list A :=
+Fixpoint split_p_all_aux {A : Type} (p : A -> bool) (l : list A) 
+  (acc_prefix : list A) (acc_current : list A) (acc_lists : list (list A)) 
+  : list A * list (list A) :=
   match l with
-  | [] => ([], [])
-  | x :: xs =>
-      if p x then ([], l)
-      else 
-        let (collected, rest) := collect_until p xs in
-        (x :: collected, rest)
-  end.
-
-Require Import List.
-Require Import Arith.
-Require Import Lia.
-Import ListNotations.
-
-Require Import Recdef.
-
-Function split_p_all {A : Type} (p : A -> bool) (l : list A) 
-  {measure length l} : list A * list (list A) :=
-  match l with
-  | [] => ([], [])
+  | [] => 
+      if acc_current then
+        (rev acc_prefix, rev (rev acc_current :: acc_lists))
+      else
+        (rev acc_prefix, rev acc_lists)
   | x :: xs =>
       if p x then
-        let (current, rest) := collect_until p xs in
-        let (prefix, lists) := split_p_all p rest in
-        ([], (x :: current) :: lists)
+        (* Nouveau groupe commence *)
+        if acc_current then
+          split_p_all_aux p xs acc_prefix [x] (rev acc_current :: acc_lists)
+        else
+          split_p_all_aux p xs acc_prefix [x] acc_lists
       else
-        let (prefix, lists) := split_p_all p xs in
-        (x :: prefix, lists)
+        (* Continuer dans le groupe actuel ou le préfixe *)
+        if acc_current then
+          split_p_all_aux p xs acc_prefix (x :: acc_current) acc_lists
+        else
+          split_p_all_aux p xs (x :: acc_prefix) acc_current acc_lists
   end.
-Proof.
-  - (* Prouver que length rest < length (x :: xs) *)
-    intros.
-    simpl.
-    assert (H: length rest <= length xs).
-    {
-     admit. 
-    }
-    lia.
-  - (* Prouver que length xs < length (x :: xs) *)
-    intros. simpl. lia.
-Admitted.
 
-
+Definition split_p_all {A : Type} (p : A -> bool) (l : list A) : list A * list (list A) :=
+  split_p_all_aux p l [] [] [].
 
 (** * Partie 2 : Implantation des multi-ensembles *)
 
