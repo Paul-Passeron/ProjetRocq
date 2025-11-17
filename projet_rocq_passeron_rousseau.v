@@ -463,12 +463,78 @@ Qed.
 
 (** *** Question 4.d *)
 
+Lemma split_p_all_aux_reconstruction :
+  forall (p : A -> bool) (l : list A) 
+         (acc_prefix : list A) (acc_current : option (list A)) (acc_lists : list (list A)),
+  let (prefix, lists) := split_p_all_aux p l acc_prefix acc_current acc_lists in
+  rev acc_prefix ++ 
+  concat (rev acc_lists) ++
+  (match acc_current with
+   | None => []
+   | Some curr => rev curr
+   end) ++
+  l = 
+  prefix ++ concat lists.
+Proof.
+  intros p l.
+  induction l as [| a l' IHl]; intros acc_prefix acc_current acc_lists.
+  - simpl.
+    destruct acc_current as [curr |];  rewrite app_nil_r.
+    + rewrite concat_app.
+      simpl.
+      rewrite app_nil_r.
+      reflexivity.
+    + reflexivity.
+  - simpl.
+    destruct (p a) eqn: Hpa.
+    + destruct acc_current as [curr |].
+      * assert( H:= IHl acc_prefix (Some [a]) (rev curr:: acc_lists)).
+        simpl in H.
+        rewrite concat_app in H.
+        simpl in H.
+        rewrite app_nil_r in H.
+        rewrite app_assoc in H.
+        destruct (split_p_all_aux p l' acc_prefix (Some [a]) (rev curr :: acc_lists)) as [prefix lists].
+        repeat rewrite <- app_assoc in H.
+        exact H.
+      * 
+        assert (H := IHl acc_prefix (Some [a]) acc_lists).
+        simpl in H.
+        destruct (split_p_all_aux p l' acc_prefix (Some [a]) acc_lists) as [prefix lists].
+        simpl.
+        exact H.
+    + destruct acc_current as [curr |].
+      * assert (H := IHl acc_prefix (Some (a::curr)) acc_lists).
+        simpl in H.
+        repeat rewrite <- app_assoc in H.
+        simpl in H.
+        destruct (split_p_all_aux p l' acc_prefix (Some (a :: curr)) acc_lists) as [prefix lists].
+        exact H.
+      * assert (H := IHl (a::acc_prefix) None acc_lists).
+        simpl in H.
+        destruct (split_p_all_aux p l' (a :: acc_prefix) None acc_lists) as [prefix lists].
+        simpl in H.
+        rewrite <- app_assoc in H.
+        replace (a :: l') with ([a] ++ l') by reflexivity.
+        rewrite app_assoc.
+        admit.
+Admitted.
+
+
 Theorem split_p_all_reconstruction :
   forall (p : A -> bool) (l : list A),
   let (prefix, lists) := split_p_all p l in
   prefix ++ concat lists = l.
 Proof.
-Admitted.
+  intros.
+  unfold split_p_all.
+  assert (H := split_p_all_aux_reconstruction p l [] None []).
+  destruct (split_p_all_aux p l [] None []) as [prefix lists].
+  simpl in H.
+  symmetry.
+  exact H.
+Qed.
+
 
 
 
