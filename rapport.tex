@@ -25,15 +25,15 @@
 	Les livrables de ce projet sont :
 	\begin{itemize}
 		\item Le sujet : \texttt{projet2025.pdf}
-		\item Le rapport : \texttt{rapport.pdf}
+		\item Le rapport : \texttt{passeron\_rousseau.pdf}
 		\item Le fichier source : \texttt{projet\_rocq\_passeron\_rousseau.v}
-		\item Un fichier makefile pour générer le rapport : \texttt{makefile}
+		\item Un fichier Makefile pour générer le rapport : \texttt{Makefile}
 		\item Un fichier \LaTeX contenant le titre du rapport : \texttt{titre.tex}
 		\item Un fichier \LaTeX contenant le squelette du rapport : \texttt{rapport.tex}
-		\item Un fichier \LaTeX contenant le corps du rapport : \texttt{projet\_rocq\_passeron\_rousseau.tex}
+		\item Un fichier \LaTeX contenant le corps du rapport : \texttt{passeron\_rousseau.tex}
 	\end{itemize}
 
-	Le tout est contenu dans une archive [nom de l'archive].tar.gz.
+	Le tout est contenu dans une archive passeron\_rousseau.tar.gz.
 
 	\section{Mode d'emploi}
 
@@ -41,10 +41,17 @@
 	\begin{enumerate}
 		\item Se placer dans le dossier extrait de l'archive.
 		\item Faire la commande : \texttt{make clean}
-		\item Faire la commande : \texttt{make}
+		\item Faire la commande : \texttt{make pdf}
 	\end{enumerate}
 
-	Une fois cela fait, un nouveau fichier \texttt{rapport.pdf} devrait être généré.
+	De même pour générer l'archive:
+	\begin{enumerate}
+		\item Se placer dans le dossier extrait de l'archive.
+		\item Faire la commande : \texttt{make clean}
+		\item Faire la commande : \texttt{make archive}
+	\end{enumerate}
+
+	Une fois cela fait, un nouveau fichier \texttt{passeron\_rousseau.tar.gz} devrait être généré.
 
 	\section{Remarque}
 	Certaines preuves sont faites sans \textit{bullet points}, notamment les preuves avec deux \textit{goals} dont le premier est trivialement vrai (pas plus de deux ou trois lignes).

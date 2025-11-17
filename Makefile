@@ -4,21 +4,22 @@ PDFLATEX = pdflatex
 LATEXMK = latexmk
 SRC = $(wildcard *.v)
 BODY = coq_body.tex
-OUT = rapport.pdf
+OUT = passeron_rousseau.pdf
 WRAPPER = rapport.tex
 COQC = coqc 
 
 .PHONY: all clean_aux archive
 
-all: $(OUT) archive
-
+all: pdf archive
+pdf: $(OUT)
 $(BODY): $(SRC)
 	$(COQC) $(PROJET)
 	$(COQDOC) --latex --body-only -o $(BODY) $(SRC)
 
 $(OUT): $(BODY) $(WRAPPER)
+	$(PDFLATEX) $(WRAPPER) 
 	$(PDFLATEX) $(WRAPPER)
-	$(PDFLATEX) $(WRAPPER)
+	mv rapport.pdf passeron_rousseau.pdf
 
 clean:
 	rm -f $(BODY) *.aux *.log *.toc *.out *.idx *.ilg *.ind *.vok *.glob *.vos *.fdb_latexmk *.sty *.fls *.vo rapport.pdf .projet_rocq_passeron_rousseau.aux *.tar.gz
@@ -27,7 +28,7 @@ clean:
 #   ARCHIVAGE DU PROJET
 # ===============================
 archive: $(OUT)
-	@echo "Création de l'archive projet.tar.gz..."
+	@echo "Création de l'archive passeron_rousseau.tar.gz..."
 	tar --exclude='*.aux' \
 	    --exclude='*.log' \
 	    --exclude='*.toc' \
@@ -43,6 +44,6 @@ archive: $(OUT)
 	    --exclude='*.fls' \
 	    --exclude='*.vo' \
 	    --exclude='.projet_rocq_passeron_rousseau.aux' \
-	    -czf projet.tar.gz \
+	    -czf passeron_rousseau.tar.gz \
 	    $(SRC) $(WRAPPER) $(OUT) Makefile
-	@echo "Archive créée : projet.tar.gz"
+	@echo "Archive créée : passeron_rousseau.tar.gz"
