@@ -304,6 +304,23 @@ Compute (split_p_all Nat.even [1; 3; 2; 5;7;8;10;11]).
 Lemma split_p_all_fst_no_sat_p:
   forall {A: Type} (p: A -> bool) l, Forall (fun x => p x = false) (fst (split_p_all p l)).
 Proof.
+  intros A0 p l.
+  induction l.
+  - simpl. apply Forall_nil.
+  - destruct (p a == true) as [Hpa | Hnpa].
+    + unfold split_p_all.
+      simpl.
+      rewrite Hpa.
+      destruct l as [| h t].
+      * simpl. apply Forall_nil.
+      * simpl.  destruct (p h == true) as [Hph | Hnph].
+        --unfold split_p_all in IHl.
+          simpl in IHl.
+          rewrite Hph in *.
+          simpl.
+          admit.
+        --admit.
+    + admit.
 Admitted.
 
 (** * Partie 2 : Implantation des multi-ensembles *)
