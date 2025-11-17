@@ -1077,7 +1077,39 @@ Lemma not_InMultiset_removeOne_gone:
   forall x s, wf s -> multiplicity x s = 1 ->
   ~ InMultiset x (removeOne x s).
 Proof.
-Admitted.
+  intros x s Hwfs Hmul.
+  induction s.
+  simpl in *.
+  discriminate.
+  destruct a as [a an].
+  simpl.
+  simpl in Hmul.
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  - subst x.
+    destruct (an == 1) as [Han | Han].
+    + rewrite Han.
+      simpl.
+      assert (an = 1).
+      assumption.
+      subst an.
+      assert (H' := Hwfs).
+      destruct H' as [H0 [H1 H2]].
+      assert (H' := all_diff_means_not_in a s H2 H1).
+      unfold InMultiset.
+      rewrite H'.
+      discriminate.
+    + subst an.
+      assert (1 <> 1). assumption.
+      contradiction.
+  - unfold InMultiset.
+    simpl.
+    destruct (T_eq_dec a x).
+    contradiction.
+    destruct Hwfs as [_ [_ Hwfs]].
+    assert (Hres := IHs Hwfs Hmul).
+    unfold InMultiset in Hres.
+    exact Hres.
+Qed.
 
 (* InMultiset préservé pour les autres éléments *)
 Lemma InMultiset_removeOne_other:
