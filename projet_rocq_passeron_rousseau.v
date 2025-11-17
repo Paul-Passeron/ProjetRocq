@@ -1047,13 +1047,6 @@ Lemma InMultiset_removeOne_other:
 Proof.
 Admitted.
 
-(* removeOne préserve wf *)
-Lemma removeOne_wf:
-  forall x s, wf s -> wf (removeOne x s).
-Proof.
-Admitted.
-
-
 (* Propriétés pour removeAll *)
 
 (* La multiplicité devient 0 après removeAll *)
@@ -1081,12 +1074,6 @@ Admitted.
 Lemma InMultiset_removeAll_other:
   forall x y s, wf s -> x <> y ->
   (InMultiset y (removeAll x s) <-> InMultiset y s).
-Proof.
-Admitted.
-
-(* removeAll préserve wf *)
-Lemma removeAll_wf:
-  forall x s, wf s -> wf (removeAll x s).
 Proof.
 Admitted.
 
