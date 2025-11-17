@@ -18,6 +18,7 @@ $(BODY): $(SRC)
 
 $(OUT): $(BODY) $(WRAPPER)
 	$(PDFLATEX) $(WRAPPER)
+	$(PDFLATEX) $(WRAPPER)
 
 clean:
 	rm -f $(BODY) *.aux *.log *.toc *.out *.idx *.ilg *.ind *.vok *.glob *.vos *.fdb_latexmk *.sty *.fls *.vo rapport.pdf .projet_rocq_passeron_rousseau.aux

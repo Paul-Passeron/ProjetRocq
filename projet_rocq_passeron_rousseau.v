@@ -1,3 +1,5 @@
+(** * Première section *)
+
 Require Import List.
 
 Import ListNotations.
