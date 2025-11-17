@@ -1329,12 +1329,41 @@ Proof.
   - intro H. exact (InMultiset_removeAll_other_2 x y s Hwfs Hxy H).
 Qed.
 
+(* removeAll sur un élément absent ne change rien *)
+Lemma removeAll_not_member:
+  forall x s, wf s -> ~ InMultiset x s ->
+  removeAll x s = s.
+Proof.
+  
+Admitted.
+
+
 (* removeAll est idempotent *)
 Lemma removeAll_idempotent:
   forall x s, wf s ->
   removeAll x (removeAll x s) = removeAll x s.
 Proof.
-Admitted.
+  intros x s Hwfs.
+  induction s.
+  simpl. reflexivity.
+  destruct a as [a an].
+  simpl.
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  - subst a.
+    destruct Hwfs as [H0 [H1 H2]].
+    assert (HnotIn: ~InMultiset x s).
+    + unfold InMultiset.
+      assert (H:= all_diff_means_not_in x s H2 H1).
+      rewrite H.
+      discriminate.
+    + exact (removeAll_not_member x s H2 HnotIn).
+  - simpl.
+    destruct (T_eq_dec a x).
+    contradiction.
+    f_equal.
+    destruct Hwfs as [_ [_ Hwfs]].
+    exact (IHs Hwfs).
+Qed.
 
 (* removeOne sur un élément absent ne change rien *)
 Lemma removeOne_not_member:
@@ -1343,9 +1372,3 @@ Lemma removeOne_not_member:
 Proof.
 Admitted.
 
-(* removeAll sur un élément absent ne change rien *)
-Lemma removeAll_not_member:
-  forall x s, wf s -> ~ InMultiset x s ->
-  removeAll x s = s.
-Proof.
-Admitted.
