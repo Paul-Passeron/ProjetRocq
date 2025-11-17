@@ -874,11 +874,82 @@ Qed.
 
 (* Propriétés pour removeOne *)
 
+Lemma all_diff_means_not_in: forall a s, 
+  wf s ->
+  (forall x occ, In (x, occ) s -> x <> a) ->
+  (member a s = false).
+Proof.
+  intros a s Hwf H.
+  induction s.
+  simpl.
+  reflexivity.
+  destruct a0 as [y yn].
+  simpl.
+  destruct (T_eq_dec y a) as [Hya | Hya].
+  - assert (Hcontr := H y yn).
+    simpl in Hcontr.
+    destruct Hcontr.
+    left.
+    reflexivity.
+    exact Hya.
+  - assert (H': (forall (x : T) (occ : nat), In (x, occ) s -> x <> a)).
+    + intros x occ.
+      assert (H' := H x occ).
+      simpl in H'.
+      intro HIn.
+      apply H'.
+      right.
+      exact HIn.
+    + destruct Hwf as [ _ [ _ Hwf]].
+      exact (IHs Hwf H').
+Qed.
+      
+      
+      
+
+
 (* La multiplicité diminue de 1 après removeOne *)
 Lemma multiplicity_removeOne_eq: 
   forall x s, wf s -> multiplicity x s > 0 ->
   multiplicity x (removeOne x s) = multiplicity x s - 1.
 Proof.
+  intros x s Hwfs Hmul.
+  induction s.
+  simpl.
+  reflexivity.
+  destruct a as [a an].
+  assert (Hwfcons := Hwfs).
+  destruct Hwfs as [_ [_ Hwfs]].
+  simpl.
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  - subst x.
+    destruct (an == 1) as [Han | Han].
+    + rewrite Han.
+      simpl.
+      destruct Hwfcons as [H0 [H1 H2]].
+      assert (H:= prop_7_aux a s).
+      assert (member a s = false).
+      * exact (all_diff_means_not_in a s H2 H1).
+      * exact (H H3).
+    + assert (Han' : an <> 1).
+      assumption.
+      apply Nat.eqb_neq in Han'.
+      rewrite Han'.
+      simpl.
+      destruct (T_eq_dec a a) as [_ | Hcontr].
+      * reflexivity.
+      * contradiction.
+  - simpl.
+    simpl in Hmul.
+    destruct (T_eq_dec a x) as [Hcontr | _].
+    + contradiction.
+    + exact (IHs Hwfs Hmul).
+Qed. 
+
+    
+
+      
+
 Admitted.
 
 (* La multiplicité reste 0 si l'élément n'est pas présent *)
