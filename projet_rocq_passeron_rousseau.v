@@ -722,6 +722,21 @@ Proof.
 Qed.*)
 
 
+Lemma prop_7_aux: forall x s, 
+  member x s = false -> multiplicity x s = 0.  
+Proof.
+  intros x s HnotMem.
+  induction s.
+  simpl.
+  reflexivity.
+  destruct a as [a an].
+  simpl in HnotMem.
+  simpl.
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  discriminate HnotMem.
+  exact (IHs HnotMem).
+Qed.
+
 Lemma prop_7 : forall x s, wf s -> (multiplicity x s = 0 <-> ~InMultiset x s).
 Proof.
   intros.
@@ -737,8 +752,21 @@ Proof.
   - intro. induction s as [| [y n] s' IH].
     + simpl. reflexivity.
     + simpl. destruct (T_eq_dec y x) as [Heq | Hneq].
-      * subst y. destruct H as [Hn [Hh1 Hh2]].
-Admitted.
+      * subst y.
+        unfold InMultiset in H0.
+        simpl in H0.
+        destruct (T_eq_dec x x) as [_ | Hcontr].
+        --contradiction.
+        --contradiction.
+      * unfold InMultiset in H0.
+        simpl in H0.
+        destruct (T_eq_dec y x) as [Hcontr | _].
+        contradiction.
+        simpl.
+        apply Bool.not_true_is_false in H0.
+        apply prop_7_aux.
+        exact H0.
+Qed.
 
 
 Lemma prop_8 : forall x n s, multiplicity x (add x n s) = n + (multiplicity x s).
