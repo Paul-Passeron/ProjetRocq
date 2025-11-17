@@ -487,11 +487,44 @@ Proof.
       destruct (T_eq_dec a x) as [Hax | Hax].
       * exact HIn.
       * assert (y <> a).
-        -- destruct (T_eq_dec y a).
-          ++ subst y.
-
-        (* -- simpl in HIn.  *)
-Admitted.
+        --destruct (T_eq_dec y a).
+          ++subst y.
+            destruct (occ==1) as [Hocc | Hocc].
+            **admit.
+            **simpl in HIn.
+              destruct HIn as [Hcontr | HIn].
+              injection Hcontr as Hcontr.
+              subst occ.
+              assert (1 <> 1). assumption.
+              contradiction.
+              exact (H1 a occ (IHs H2 HIn)). 
+          ++ assumption.
+        --simpl in HIn.
+          destruct HIn as [Hcontr | HIn].
+          injection Hcontr as Hcontr.
+          symmetry in Hcontr.
+          contradiction.
+          exact (IHs H2 HIn).
+    + simpl in HIn.
+      destruct (T_eq_dec a x) as [Hax | Hax].
+      * subst a.
+        assert (H: an <> 1). assumption.
+        apply Nat.eqb_neq in H.
+        rewrite H in HIn.
+        simpl in HIn.
+        destruct HIn as [Hcontr | HIn].
+        injection Hcontr as Hcontr.
+        contradiction.
+        exact HIn.
+      * destruct (T_eq_dec a y) as [Hay | Hay].
+        --subst a.
+          admit.
+        --simpl in HIn.
+          destruct HIn as [Hcontr | HIn].
+          injection Hcontr as Hcontr.
+          contradiction.
+          exact (H3 HIn).
+  Admitted.
 
 Lemma removeOne_wf: forall (s: multiset) (x: T), wf s -> wf (removeOne x s).
 Proof.
