@@ -1233,12 +1233,52 @@ Proof.
     exact (IHs H2).
 Qed.
 
+Lemma InMultiset_removeAll_other_1:
+  forall x y s, wf s -> x <> y ->
+  InMultiset y (removeAll x s) -> InMultiset y s.
+Proof.
+  intros x y s Hwfs Hxy H.
+  induction s.
+  simpl in H. assumption.
+  unfold InMultiset in *.
+  destruct a as [a an].
+  simpl.
+  destruct Hwfs as [H0 [H1 H2]].
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  - subst x.
+    destruct (T_eq_dec a y) as [Hay | Hay].
+    reflexivity.
+    simpl in H.
+    destruct (T_eq_dec a a).
+    exact H.
+    contradiction.
+  - destruct (T_eq_dec a y) as [Hay | Hay].
+    reflexivity.
+    simpl in H.
+    destruct (T_eq_dec a x).
+    contradiction.
+    simpl in H.
+    destruct (T_eq_dec a y).
+    contradiction.
+    exact (IHs H2 H).
+Qed.
+
+Lemma InMultiset_removeAll_other_2:
+  forall x y s, wf s -> x <> y ->
+  InMultiset y s -> InMultiset y (removeAll x s).
+Proof.
+Admitted.
+
 (* InMultiset préservé pour les autres éléments *)
 Lemma InMultiset_removeAll_other:
   forall x y s, wf s -> x <> y ->
   (InMultiset y (removeAll x s) <-> InMultiset y s).
 Proof.
-Admitted.
+  intros x y s Hwfs Hxy.
+  split.
+  - intro H. exact (InMultiset_removeAll_other_1 x y s Hwfs Hxy H).
+  - intro H. exact (InMultiset_removeAll_other_2 x y s Hwfs Hxy H).
+Qed.
 
 (* removeAll est idempotent *)
 Lemma removeAll_idempotent:
