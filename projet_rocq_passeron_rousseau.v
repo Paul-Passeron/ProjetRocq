@@ -648,7 +648,35 @@ Proof.
     - intro. induction s as [| [z k] s' IH]. destruct n.
       + simpl. exact H0.
       + unfold InMultiset. unfold InMultiset in H0.
-Admitted.
+        simpl in H0.
+        discriminate H0.
+      + unfold InMultiset.
+        unfold InMultiset in H0.
+        simpl in H0.
+        simpl. destruct n.
+        * simpl.
+          destruct (T_eq_dec z y) as [Hzy | Hzy].
+          reflexivity.
+          exact H0.
+        * simpl.
+          destruct (T_eq_dec z x) as [Hzx | Hzx].
+          subst z.
+          destruct (T_eq_dec x y) as [Hcontr | _].
+          contradiction.
+          --simpl.
+            destruct (T_eq_dec x y) as [Hcontr | _].
+            contradiction.
+            exact H0.
+          --simpl.
+            destruct (T_eq_dec z y) as [Hzy | Hzy].
+            reflexivity.
+            assert (H' : InMultiset y s').
+            unfold InMultiset.
+            assumption.
+            apply IH in H'.
+            unfold InMultiset in H'.
+            exact H'.
+Qed.
 
 (*Lemma prop_7_aux : forall x n s, In (x,n) s -> wf s -> n >= 1.
 Proof.
