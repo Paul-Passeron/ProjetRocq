@@ -454,7 +454,12 @@ Theorem split_p_all_lists_Forall :
   forall (p : A -> bool) (l : list A),
   Forall (first_true_rest_false p) (snd (split_p_all p l)).
 Proof.
-Admitted.
+  intros p l.
+  unfold split_p_all.
+  apply split_p_all_aux_lists_Forall.
+  - apply Forall_nil.
+  - trivial.
+Qed.
 
 
 (** * Partie 2 : Implantation des multi-ensembles *)
