@@ -299,6 +299,11 @@ Definition split_p_all (p : A -> bool) (l : list A) : list A * list (list A) :=
 
 (** **** b) *)
 
+(* TODO: réécrire avec forall, j'avais oublier que ça
+  existait. Sinon juste écrire une équivalence entre les
+  deux formulations
+*)
+
 Definition all_not_p (p : A -> bool) (l : list A) : Prop :=
   forall x, In x l -> p x = false.
 
@@ -362,6 +367,33 @@ Proof.
   simpl in Hin.
   contradiction.
 Qed.
+
+(** **** c) *)
+
+Definition first_true_rest_false (p : A -> bool) (l : list A) : Prop :=
+  match l with
+  | [] => True
+  | x :: xs => p x = true /\ Forall (fun y => p y = false) xs
+  end.
+
+Lemma split_p_all_aux_lists_Forall : 
+  forall (p : A -> bool) (l : list A) 
+         (acc_prefix : list A) (acc_current : option (list A)) (acc_lists : list (list A)),
+  Forall (first_true_rest_false p) acc_lists ->
+  (match acc_current with
+   | None => True
+   | Some curr => first_true_rest_false p (rev curr)
+   end) ->
+  Forall (first_true_rest_false p) (snd (split_p_all_aux p l acc_prefix acc_current acc_lists)).
+Proof.
+Admitted.
+
+Theorem split_p_all_lists_Forall :
+  forall (p : A -> bool) (l : list A),
+  Forall (first_true_rest_false p) (snd (split_p_all p l)).
+Proof.
+Admitted.
+
 
 (** * Partie 2 : Implantation des multi-ensembles *)
 
