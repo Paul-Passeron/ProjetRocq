@@ -266,7 +266,7 @@ Qed.
 
 (** ** Question 4 *)
 
-(** *** a) *)
+(** *** Question 4.a *)
 
 Fixpoint split_p_all_aux (p : A -> bool) (l : list A) 
   (acc_prefix : list A) (acc_current : option (list A)) (acc_lists : list (list A)) 
@@ -297,7 +297,7 @@ Fixpoint split_p_all_aux (p : A -> bool) (l : list A)
 Definition split_p_all (p : A -> bool) (l : list A) : list A * list (list A) :=
   split_p_all_aux p l [] None [].
 
-(** **** b) *)
+(** *** Question 4.b *)
 
 (* TODO: réécrire avec forall, j'avais oublier que ça
   existait. Sinon juste écrire une équivalence entre les
@@ -368,7 +368,7 @@ Proof.
   contradiction.
 Qed.
 
-(** **** c) *)
+(** *** Question 4.c *)
 
 Definition first_true_rest_false (p : A -> bool) (l : list A) : Prop :=
   match l with
@@ -460,6 +460,16 @@ Proof.
   - apply Forall_nil.
   - trivial.
 Qed.
+
+(** *** Question 4.d *)
+
+Theorem split_p_all_reconstruction :
+  forall (p : A -> bool) (l : list A),
+  let (prefix, lists) := split_p_all p l in
+  prefix ++ concat lists = l.
+Proof.
+Admitted.
+
 
 
 (** * Partie 2 : Implantation des multi-ensembles *)
