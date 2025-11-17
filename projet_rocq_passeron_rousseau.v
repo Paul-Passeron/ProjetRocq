@@ -387,10 +387,6 @@ Proof.
   - exact I.
 Qed.
 
-Lemma not_in_after_remove:
-  forall (x y: T) (s: multiset), x <> y -> wf s -> 
-  (forall (z: T) (occ: nat), In (y, occ) s -> z <> x) -> 
-  (forall (z: T) (occ: nat), In (y, occ) (removeOne y s) -> z <> x) -> 
 
 Lemma add_wf: forall (x: T) (n: nat) (s: multiset), wf s -> wf (add x n s).
 Proof.
@@ -419,7 +415,62 @@ Proof.
 Qed.
 
 
+Lemma not_in_after_remove:
+  forall (x y: T) (s: multiset), x <> y -> wf s -> 
+  (forall (z: T) (occ: nat), In (z, occ) s -> z <> x) -> 
+  (forall (z: T) (occ: nat), In (z, occ) (removeOne y s) -> z <> x).
+Proof.
+  intros x y s Hxy Hwf_s Hnot_in.
+  induction s.
+  - simpl. intros z occ contr. contradiction.
+  - intros z occ.
+    destruct a as [a an].
+    simpl.
+    destruct (T_eq_dec a y) as [Hay | Hnay].
+    + destruct (an == 1) as [Han | Han].
+      * rewrite Han.
+        simpl.
+        intro Hin.
+        assert (H := Hwf_s).
+        unfold wf in H.
+        destruct H as [H0 [H1 H2]].
+        assert (Hzoccin := Hnot_in z occ).
+        simpl in Hzoccin.
+        
 
+
+Admitted.
+
+
+
+Lemma not_in_before_remove:
+  forall (x y: T) (occ: nat) (s: multiset), x <> y -> wf s -> 
+  (In (y, occ) (removeOne x s)) ->
+  (In (y, occ) s).
+Proof.
+  intros x y occ s Hxy Hwfs HIn.
+  induction s.
+  - simpl in HIn. contradiction.
+  - destruct a as [a an].
+    simpl in Hwfs.
+    destruct Hwfs as [H0 [H1 H2]].
+    simpl.
+    assert (H3 := IHs H2).
+    right.
+    destruct (an == 1) as [Heq1 | Hneq1].
+    + simpl in HIn.
+      rewrite Heq1 in HIn.
+      simpl in HIn.
+      destruct (T_eq_dec a x) as [Hax | Hax].
+      * exact HIn.
+      * assert (y <> a).
+        -- admit.
+        -- simpl in HIn. 
+   
+
+    
+
+Admitted.
 
 Lemma removeOne_wf: forall (s: multiset) (x: T), wf s -> wf (removeOne x s).
 Proof.
@@ -437,7 +488,8 @@ Proof.
         split.
         lia.
         split.
-        -- admit.
+        -- intros y occ Hin. 
+          apply ((not_in_after_remove a x s' Hnax Hwf_s' Hnot_in_s') y occ Hin).
         -- exact (IH (Hwf_s')).
     + intro Han. 
       assert (an <> 1).
@@ -451,7 +503,19 @@ Proof.
         split.
         -- exact Hnot_in_s'.
         -- exact Hwf_s'.
-Admitted.
+      * simpl.
+        split.
+        exact Han_pos.
+        split.
+        -- intros y occ HIn .
+           assert (H' := Hnot_in_s' y occ).
+           destruct (T_eq_dec x y).
+           ++ rewrite e in Hnax.
+              symmetry.
+              exact Hnax.
+           ++ exact (H' (not_in_before_remove x y occ s' n Hwf_s' HIn)).
+        -- exact (IH Hwf_s'). 
+Qed.
 
 
 Lemma removeAll_wf: forall (s: multiset) (x: T), wf s -> wf (removeAll x s).
@@ -598,7 +662,7 @@ Proof.
     + simpl.
       destruct (T_eq_dec x y) as [Heq | Hneq].
       * contradiction.
-      * simpl. reflexivity.
+      * reflexivity.
   - simpl in Hwf. destruct Hwf as [Hk_pos [Hnot_in_s' Hwf_s']]. simpl. destruct n as [| n'].
     + simpl. destruct (T_eq_dec z y) as [Heq1 | Hneq1].
       * subst. destruct (T_eq_dec y x) as [Heq2 | Hneq2].
@@ -606,7 +670,7 @@ Proof.
         -- simpl. reflexivity.
       * destruct (T_eq_dec z y).
         -- contradiction.
-        -- admit.
+        -- reflexivity.
     + simpl. destruct (T_eq_dec z x) as [Heq | Hneq].
       * subst. destruct (T_eq_dec x y) as [Heq2 | Hneq2].
         -- contradiction.
@@ -618,10 +682,10 @@ Proof.
           ++ contradiction.
           ++ destruct (T_eq_dec y y) as [Heq3 | Hneq3].
             ** reflexivity.
-            ** admit.
+            ** contradiction.
         -- simpl. destruct (T_eq_dec z y) as [Heq3 | Hneq3].
           ++ contradiction.
-          ++ admit.
-Admitted.
-
+          ++ exact ((IH Hwf_s') x y Hxy (S n')).
+Qed.
+             
 
