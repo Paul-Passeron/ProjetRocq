@@ -1161,9 +1161,6 @@ Proof.
   - intro H0. exact (InMultiset_removeOne_other_2 x y s H Hxy H0).
 Qed.
 
-
-
-
 (** *** Propriétés pour removeAll *)
 
 (* La multiplicité devient 0 après removeAll *)
@@ -1171,7 +1168,23 @@ Lemma multiplicity_removeAll_eq:
   forall x s, wf s ->
   multiplicity x (removeAll x s) = 0.
 Proof.
-Admitted.
+  intros x s Hwfs.
+  induction s.
+  simpl.
+  reflexivity.
+  destruct a as [a an].
+  simpl.
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  - subst a.
+    destruct Hwfs as [H0 [ H1 H2]].
+    assert (H := all_diff_means_not_in x s H2 H1).
+    exact (prop_7_aux x s H).
+  - simpl.
+    destruct (T_eq_dec a x).
+    + contradiction.
+    + destruct Hwfs as [_ [_ Hwfs]].
+    exact (IHs Hwfs).
+Qed.
 
 (* La multiplicité des autres éléments ne change pas *)
 Lemma multiplicity_removeAll_neq:
