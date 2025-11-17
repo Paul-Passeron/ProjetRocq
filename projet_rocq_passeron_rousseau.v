@@ -386,24 +386,44 @@ Lemma split_p_all_aux_lists_Forall :
    end) ->
   Forall (first_true_rest_false p) (snd (split_p_all_aux p l acc_prefix acc_current acc_lists)).
 Proof.
-  intros p l acc_prefix acc_current acc_lists.
-  case acc_current.
-  - intros l' Hforall Hrevl'.
-    induction l.
+  intros p l.
+  induction l; intros.
+  - simpl.
+    destruct acc_current as [curr |] eqn: Hcu.
     + simpl.
       apply Forall_app.
       split.
       * apply Forall_rev.
-        exact Hforall.
+        exact H.
       * apply Forall_cons.
-        exact Hrevl'.
+        exact H0.
         apply Forall_nil.
     + simpl.
-      case (p a) eqn: Hpa.
-      * admit.
-      * admit.
-  - intros Hforall _.
-    admit.
+      apply Forall_rev.
+      exact H.
+  - simpl.
+    destruct (p a) eqn:Hpa.
+    + destruct acc_current as [curr |] eqn: Hcu.
+      * apply IHl.
+        --apply Forall_cons.
+          exact H0.
+          exact H.
+        --simpl.
+          split.
+          exact Hpa.
+          apply Forall_nil.
+      * apply IHl.
+        exact H.
+        simpl.
+        split.
+        exact Hpa.
+        apply Forall_nil.
+    + destruct acc_current as [curr |] eqn: Hcu.
+      * apply IHl.
+        exact H.
+        simpl.
+        unfold first_true_rest_false.
+        admit.
 Admitted.
 
 Theorem split_p_all_lists_Forall :
