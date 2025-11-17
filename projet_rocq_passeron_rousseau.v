@@ -903,9 +903,6 @@ Proof.
     + destruct Hwf as [ _ [ _ Hwf]].
       exact (IHs Hwf H').
 Qed.
-      
-      
-      
 
 
 (* La multiplicité diminue de 1 après removeOne *)
@@ -946,18 +943,48 @@ Proof.
     + exact (IHs Hwfs Hmul).
 Qed. 
 
-    
-
-      
-
-Admitted.
-
 (* La multiplicité reste 0 si l'élément n'est pas présent *)
 Lemma multiplicity_removeOne_zero: 
   forall x s, wf s -> multiplicity x s = 0 ->
   multiplicity x (removeOne x s) = 0.
 Proof.
-Admitted.
+  intros x s Hwfs Hmul.
+  induction s.
+  simpl.
+  reflexivity.
+  destruct a as [a an].
+  simpl.
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  - subst x.
+    destruct (an == 1) as [Han | Han].
+    + rewrite Han.
+      simpl.
+      assert (an = 1).
+      assumption.
+      subst an.
+      simpl in Hmul.
+      destruct (T_eq_dec a a) as [_ | Hcontr].
+      * discriminate Hmul.
+      * contradiction.
+    + assert (Han' : an <> 1).
+      assumption.
+      apply Nat.eqb_neq in Han'.
+      rewrite Han'.
+      simpl.
+      simpl in Hmul.
+      destruct (T_eq_dec a a) as [_ | Hcontr].
+      * destruct Hwfs as [Hcontr [ _ _]].
+        subst an.
+        lia.
+      * assumption.
+  - simpl.
+    simpl in Hmul.
+    destruct (T_eq_dec a x) as [Hcontr | _].
+    contradiction.
+    destruct Hwfs as [_ [_ Hwfs]].
+    exact (IHs Hwfs Hmul).
+Qed.
+
 
 (* La multiplicité des autres éléments ne change pas *)
 Lemma multiplicity_removeOne_neq: 
