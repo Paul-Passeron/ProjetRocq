@@ -268,7 +268,7 @@ Qed.
 
 (** * a) *)
 
-Fixpoint split_p_all_aux {A : Type} (p : A -> bool) (l : list A) 
+Fixpoint split_p_all_aux (p : A -> bool) (l : list A) 
   (acc_prefix : list A) (acc_current : option (list A)) (acc_lists : list (list A)) 
   : list A * list (list A) :=
   match l with
@@ -294,26 +294,43 @@ Fixpoint split_p_all_aux {A : Type} (p : A -> bool) (l : list A)
         end
   end.
 
-Definition split_p_all {A : Type} (p : A -> bool) (l : list A) : list A * list (list A) :=
+Definition split_p_all (p : A -> bool) (l : list A) : list A * list (list A) :=
   split_p_all_aux p l [] None [].
-
-Compute (split_p_all Nat.even [1; 3; 2; 5;7;8;10;11]). 
 
 (** * b) *)
 
-Definition all_not_p {A : Type} (p : A -> bool) (l : list A) : Prop :=
+Definition all_not_p (p : A -> bool) (l : list A) : Prop :=
   forall x, In x l -> p x = false.
 
+Lemma all_not_p_rev: forall (p : A -> bool) (l : list A),
+all_not_p p l <-> all_not_p p (rev l).
+Proof.
+  intros.
+  split; intro H; unfold all_not_p in *; intros x H'.
+  - rewrite in_rev in H'.
+    rewrite rev_involutive in H'.
+    exact (H x H').
+  - rewrite in_rev in H'.
+    exact (H x H').
+Qed.
+
 Lemma split_p_all_aux_prefix_not_p : 
-  forall {A : Type} (p : A -> bool) (l : list A) 
+  forall (p : A -> bool) (l : list A) 
          (acc_prefix : list A) (acc_current : option (list A)) (acc_lists : list (list A)),
   all_not_p p acc_prefix ->
   all_not_p p (fst (split_p_all_aux p l acc_prefix acc_current acc_lists)).
 Proof.
+  intros A p l.
+  induction l as [| x xs IH].
+  intros.
+  - simpl.
+    case acc_current.
+    + intro l.
+      simpl.
 Admitted.
 
 Theorem split_p_all_fst_no_sat_p :
-  forall {A : Type} (p : A -> bool) (l : list A),
+  forall (p : A -> bool) (l : list A),
   all_not_p p (fst (split_p_all p l)).
 Proof.
   intros A p l.
