@@ -1267,7 +1267,25 @@ Lemma InMultiset_removeAll_other_2:
   forall x y s, wf s -> x <> y ->
   InMultiset y s -> InMultiset y (removeAll x s).
 Proof.
-Admitted.
+  intros x y s Hwfs Hxy H.
+  induction s.
+  simpl in H. assumption.
+  unfold InMultiset in *.
+  destruct a as [a an].
+  simpl.
+  destruct Hwfs as [H0 [H1 H2]].
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  - subst x.
+    simpl in H.
+    destruct (T_eq_dec a y) as [Hay | Hay].
+    contradiction.
+    assumption.
+  - simpl.
+    simpl in H.
+    destruct (T_eq_dec a y) as [Hay | Hay].
+    reflexivity.
+    exact (IHs H2 H).
+Qed.
 
 (* InMultiset préservé pour les autres éléments *)
 Lemma InMultiset_removeAll_other:
