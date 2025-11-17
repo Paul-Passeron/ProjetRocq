@@ -269,31 +269,37 @@ Qed.
 (** * a) *)
 
 Fixpoint split_p_all_aux {A : Type} (p : A -> bool) (l : list A) 
-  (acc_prefix : list A) (acc_current : list A) (acc_lists : list (list A)) 
+  (acc_prefix : list A) (acc_current : option (list A)) (acc_lists : list (list A)) 
   : list A * list (list A) :=
   match l with
   | [] => 
-      if acc_current then
-        (rev acc_prefix, rev (rev acc_current :: acc_lists))
-      else
-        (rev acc_prefix, rev acc_lists)
+      match acc_current with
+      | Some curr => (rev acc_prefix, rev (rev curr :: acc_lists))
+      | None => (rev acc_prefix, rev acc_lists)
+      end
   | x :: xs =>
       if p x then
-        (* Nouveau groupe commence *)
-        if acc_current then
-          split_p_all_aux p xs acc_prefix [x] (rev acc_current :: acc_lists)
-        else
-          split_p_all_aux p xs acc_prefix [x] acc_lists
+        match acc_current with
+        | Some curr => 
+            split_p_all_aux p xs acc_prefix (Some [x]) (rev curr :: acc_lists)
+        | None =>
+            split_p_all_aux p xs acc_prefix (Some [x]) acc_lists
+        end
       else
-        (* Continuer dans le groupe actuel ou le préfixe *)
-        if acc_current then
-          split_p_all_aux p xs acc_prefix (x :: acc_current) acc_lists
-        else
-          split_p_all_aux p xs (x :: acc_prefix) acc_current acc_lists
+        match acc_current with
+        | Some curr =>
+            split_p_all_aux p xs acc_prefix (Some (x :: curr)) acc_lists
+        | None =>
+            split_p_all_aux p xs (x :: acc_prefix) None acc_lists
+        end
   end.
 
 Definition split_p_all {A : Type} (p : A -> bool) (l : list A) : list A * list (list A) :=
-  split_p_all_aux p l [] [] [].
+  split_p_all_aux p l [] None [].
+
+Compute (split_p_all Nat.even [1; 3; 2; 5;7;8;10;11]). 
+
+
 
 (** * Partie 2 : Implantation des multi-ensembles *)
 
