@@ -465,66 +465,32 @@ Proof.
       exact (IHs H2 Hin).
 Qed.
 
-
 Lemma not_in_before_remove:
   forall (x y: T) (occ: nat) (s: multiset), x <> y -> wf s -> 
   (In (y, occ) (removeOne x s)) ->
   (In (y, occ) s).
 Proof.
   intros x y occ s Hxy Hwfs HIn.
-  induction s.
-  - simpl in HIn. contradiction.
-  - destruct a as [a an].
-    simpl in Hwfs.
+  induction s as [| [a an] s' IHs].
+    simpl in HIn. contradiction.
     destruct Hwfs as [H0 [H1 H2]].
-    simpl.
-    assert (H3 := IHs H2).
-    right.
-    destruct (an == 1) as [Heq1 | Hneq1].
+    simpl in HIn.
+    destruct (T_eq_dec a x) as [Hax | Hax].
+    + subst a.
+      destruct (an =? 1) eqn:Heq1.
+      * simpl. right. exact HIn.
+      * simpl in HIn.
+        destruct HIn as [Heq | HIn'].
+        -- injection Heq as Hy Hocc.
+           subst y. contradiction.
+        -- simpl. right. exact HIn'.
     + simpl in HIn.
-      rewrite Heq1 in HIn.
-      simpl in HIn.
-      destruct (T_eq_dec a x) as [Hax | Hax].
-      * exact HIn.
-      * assert (y <> a).
-        --destruct (T_eq_dec y a).
-          ++subst y.
-            destruct (occ==1) as [Hocc | Hocc].
-            **admit.
-            **simpl in HIn.
-              destruct HIn as [Hcontr | HIn].
-              injection Hcontr as Hcontr.
-              subst occ.
-              assert (1 <> 1). assumption.
-              contradiction.
-              exact (H1 a occ (IHs H2 HIn)). 
-          ++ assumption.
-        --simpl in HIn.
-          destruct HIn as [Hcontr | HIn].
-          injection Hcontr as Hcontr.
-          symmetry in Hcontr.
-          contradiction.
-          exact (IHs H2 HIn).
-    + simpl in HIn.
-      destruct (T_eq_dec a x) as [Hax | Hax].
-      * subst a.
-        assert (H: an <> 1). assumption.
-        apply Nat.eqb_neq in H.
-        rewrite H in HIn.
-        simpl in HIn.
-        destruct HIn as [Hcontr | HIn].
-        injection Hcontr as Hcontr.
-        contradiction.
-        exact HIn.
-      * destruct (T_eq_dec a y) as [Hay | Hay].
-        --subst a.
-          admit.
-        --simpl in HIn.
-          destruct HIn as [Hcontr | HIn].
-          injection Hcontr as Hcontr.
-          contradiction.
-          exact (H3 HIn).
-  Admitted.
+      destruct HIn as [Heq | HIn'].
+      * simpl. left. exact Heq.
+      * simpl. right. apply IHs.
+        -- exact H2.
+        -- exact HIn'.
+Qed.
 
 Lemma removeOne_wf: forall (s: multiset) (x: T), wf s -> wf (removeOne x s).
 Proof.
