@@ -539,10 +539,91 @@ Proof.
         -- exact (IH Hwf_s'). 
 Qed.
 
+Lemma rawf_aux_1: forall x y s occ, x <> y -> wf s -> 
+  (In (y, occ) (removeAll x s)) ->
+  (In (y, occ) s).
+Proof.
+  intros x y s occ Hxy Hwfs HIn.
+  induction s.
+  simpl.
+  simpl in HIn.
+  contradiction.
+  simpl.
+  destruct a as [a an].
+  assert (H := Hwfs).
+  simpl in H.
+  apply proj2 in H.
+  apply proj2 in H.
+  simpl in HIn.
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  - subst a.
+    right.
+    assumption.
+  - simpl in HIn.
+    destruct HIn as [Hl | Hr].
+    + left. assumption.
+    + right. exact (IHs H Hr).   
+Qed.
+
+Lemma rawf_aux_2: forall x s occ, wf s -> In (x, occ) (removeAll x s) -> False.
+Proof.
+  intros x s occ Hwf H.
+  induction s.
+  simpl in *.
+  assumption.
+  destruct a as [a an].
+  simpl in H.
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  - subst x.
+    simpl in Hwf.
+    destruct Hwf as [H0 [H1 H2]].
+    assert (H' := H1 a occ).
+    apply H' in H.
+    contradiction.
+  - simpl in H.
+    destruct H as [Hcontr | HIn].
+    + injection Hcontr as Hcontr.
+      contradiction.
+    + destruct Hwf as [_ [_ H]].
+      exact (IHs H HIn).
+Qed.    
 
 Lemma removeAll_wf: forall (s: multiset) (x: T), wf s -> wf (removeAll x s).
 Proof.
-Admitted.
+  intros s x Hwfs.
+  induction s.
+  simpl.
+  simpl in Hwfs.
+  assumption.
+  destruct a as [a an].
+  simpl.
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  - destruct Hwfs as [_ [_ H]].
+    exact H.
+  - simpl.
+    assert (backup := Hwfs).
+    simpl in Hwfs.
+    destruct Hwfs as [Han [HnotIn Hwfs]].
+    split.
+    exact Han.
+    split.
+    + intros y occ.
+      apply IHs in Hwfs.
+      intro HIn.
+      apply (rawf_aux_1 x y s occ) in HIn.
+      * apply (HnotIn y occ). assumption.
+      * destruct (T_eq_dec x y) as [Hxy | Hxy].
+        --subst y.
+          assert (H: wf s).
+          ++ destruct backup as [_ [ _ H']].
+             exact H'.
+          ++ assert (H' := rawf_aux_2 x s occ H HIn).
+             contradiction.
+        -- assumption.
+      * destruct backup as [_ [ _ H']].
+        exact H'.
+    + exact (IHs Hwfs).
+Qed.
 
 
 (* question 3 *)
