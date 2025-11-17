@@ -1,5 +1,5 @@
 \documentclass{report}
-\usepackage{coqdoc}  % <---- ESSENTIEL
+\usepackage{coqdoc}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{hyperref}
@@ -11,21 +11,46 @@
 \tableofcontents 
 
 \chapter{Introduction} 
+	
+	\section{Préambule}
+	
+	\begin{itemize}
+		\item Le projet a été réalisé sur VSCode (VScoq) d'une part, et sur coqide de l'autre.
+		\item Les résultats ont été mis en commun grâce à Github.
+		\item Le rapport a été écrit en \LaTeX et le chapitre 2 a été généré grâce à coqdoc.
+	\end{itemize}
 
-	aaa
+	\section{Livrables}
 
-\input{coq_body.tex}  % <--- fichier généré par le Makefile
+	Les livrables de ce projet sont :
+	\begin{itemize}
+		\item Le sujet : \texttt{projet2025.pdf}
+		\item Le rapport : \texttt{rapport.pdf}
+		\item Le fichier source : \texttt{projet\_rocq\_passeron\_rousseau.v}
+		\item Un fichier makefile pour générer le rapport : \texttt{makefile}
+		\item Un fichier \LaTeX contenant le titre du rapport : \texttt{titre.tex}
+		\item Un fichier \LaTeX contenant le squelette du rapport : \texttt{rapport.tex}
+		\item Un fichier \LaTeX contenant le corps du rapport : \texttt{projet\_rocq\_passeron\_rousseau.tex}
+	\end{itemize}
+
+	Le tout est contenu dans une archive [nom de l'archive].tar.gz.
+
+	\section{Mode d'emploi}
+
+	Si pour une raison quelconque le rapport a mal été généré, il est possible d'en faire un nouveau en suivant les étapes suivantes : 
+	\begin{enumerate}
+		\item Se placer dans le dossier extrait de l'archive.
+		\item Faire la commande : \texttt{make clean}
+		\item Faire la commande : \texttt{make}
+	\end{enumerate}
+
+	Une fois cela fait, un nouveau fichier \texttt{rapport.pdf} devrait être généré.
+
+\input{coq_body.tex}
 
 \chapter{Conclusion}
 
-
-	À l'exception des preuves suivantes, toutes ont été prouvées :
-	\begin{enumerate}
-		\item aaa
-		\item aaa
-		\item aaaa
-		\item aaa
-	\end{enumerate}
+	À l'exception de la question 4 de l'exercice 1, tout a été prouvé.
 
 \end{document}
 

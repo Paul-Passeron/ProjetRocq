@@ -10,6 +10,10 @@ Import Nat.
 Parameter A: Type.
 
 Parameter A_eq_dec: forall (x y: A), {x=y} + {~x=y}.
+(** 
+  - [A] est un type arbitraire fourni comme paramètre.
+  - [A_eq_dec] fournit une décision d’égalité pour la suite.
+*)
 
 (** ** Question 1 *)
 Fixpoint repeat (x: A) (n: nat): list A :=
