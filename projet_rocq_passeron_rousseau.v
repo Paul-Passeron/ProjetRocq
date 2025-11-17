@@ -301,50 +301,30 @@ Compute (split_p_all Nat.even [1; 3; 2; 5;7;8;10;11]).
 
 (** * b) *)
 
-Lemma fst_does_not_care_about_the_acc:
-forall {A : Type} (p : A -> bool) (l : list A) 
-  (acc_prefix : list A) (acc_current : option (list A)) (acc_lists : list (list A)), forall a b c, fst (split_p_all_aux p l acc_prefix acc_current acc_lists) = fst (split_p_all_aux p l a b c).
+Definition all_not_p {A : Type} (p : A -> bool) (l : list A) : Prop :=
+  forall x, In x l -> p x = false.
+
+Lemma split_p_all_aux_prefix_not_p : 
+  forall {A : Type} (p : A -> bool) (l : list A) 
+         (acc_prefix : list A) (acc_current : option (list A)) (acc_lists : list (list A)),
+  all_not_p p acc_prefix ->
+  all_not_p p (fst (split_p_all_aux p l acc_prefix acc_current acc_lists)).
+Proof.
 Admitted.
 
-Lemma split_p_all_fst_no_sat_p:
-  forall {A: Type} (p: A -> bool) l, Forall (fun x => p x = false) (fst (split_p_all p l)).
+Theorem split_p_all_fst_no_sat_p :
+  forall {A : Type} (p : A -> bool) (l : list A),
+  all_not_p p (fst (split_p_all p l)).
 Proof.
-  intros A0 p l.
-  induction l.
-  - simpl. apply Forall_nil.
-  - destruct (p a == true) as [Hpa | Hnpa].
-    + unfold split_p_all.
-      simpl.
-      rewrite Hpa.
-      destruct l as [| h t].
-      * simpl. apply Forall_nil.
-      * simpl.  destruct (p h == true) as [Hph | Hnph].
-        --unfold split_p_all in IHl.
-          simpl in IHl.
-          rewrite Hph in *.
-          simpl.
-          assert (H:= (fst_does_not_care_about_the_acc p t [] (Some[h]) [[a]]) [] (Some [h]) []) .
-          rewrite H.
-          exact IHl.
-        --unfold split_p_all in IHl.
-          simpl in IHl.
-          assert (Hphf: p h = false).
-          apply Bool.not_true_is_false.
-          assumption.
-          rewrite Hphf in *.
-          assert (H:= (fst_does_not_care_about_the_acc p t [] (Some[h; a]) []) [h] None []).
-          rewrite H.
-          exact IHl.
-    + unfold split_p_all in *.
-      simpl in *.
-      assert (Hpaf: p a = false).
-      apply Bool.not_true_is_false.
-      assumption.
-      rewrite Hpaf in *.
-      assert (H:= (fst_does_not_care_about_the_acc p l [a] None []) [] None []).
-      rewrite H.
-      exact IHl.
+  intros A p l.
+  unfold split_p_all.
+  apply split_p_all_aux_prefix_not_p.
+  unfold all_not_p.
+  intros x Hin.
+  simpl in Hin.
+  contradiction.
 Qed.
+
 (** * Partie 2 : Implantation des multi-ensembles *)
 
 Parameter T : Type.
