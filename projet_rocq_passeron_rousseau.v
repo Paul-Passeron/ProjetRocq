@@ -872,3 +872,110 @@ Proof.
 Qed.
              
 
+(* Propriétés pour removeOne *)
+
+(* La multiplicité diminue de 1 après removeOne *)
+Lemma multiplicity_removeOne_eq: 
+  forall x s, wf s -> multiplicity x s > 0 ->
+  multiplicity x (removeOne x s) = multiplicity x s - 1.
+Proof.
+Admitted.
+
+(* La multiplicité reste 0 si l'élément n'est pas présent *)
+Lemma multiplicity_removeOne_zero: 
+  forall x s, wf s -> multiplicity x s = 0 ->
+  multiplicity x (removeOne x s) = 0.
+Proof.
+Admitted.
+
+(* La multiplicité des autres éléments ne change pas *)
+Lemma multiplicity_removeOne_neq: 
+  forall x y s, wf s -> x <> y ->
+  multiplicity y (removeOne x s) = multiplicity y s.
+Proof.
+Admitted.
+
+(* InMultiset après removeOne si multiplicité > 1 *)
+Lemma InMultiset_removeOne_still_in:
+  forall x s, wf s -> multiplicity x s > 1 ->
+  InMultiset x (removeOne x s).
+Proof.
+Admitted.
+
+(* Pas InMultiset après removeOne si multiplicité = 1 *)
+Lemma not_InMultiset_removeOne_gone:
+  forall x s, wf s -> multiplicity x s = 1 ->
+  ~ InMultiset x (removeOne x s).
+Proof.
+Admitted.
+
+(* InMultiset préservé pour les autres éléments *)
+Lemma InMultiset_removeOne_other:
+  forall x y s, wf s -> x <> y ->
+  (InMultiset y (removeOne x s) <-> InMultiset y s).
+Proof.
+Admitted.
+
+(* removeOne préserve wf *)
+Lemma removeOne_wf:
+  forall x s, wf s -> wf (removeOne x s).
+Proof.
+Admitted.
+
+
+(* Propriétés pour removeAll *)
+
+(* La multiplicité devient 0 après removeAll *)
+Lemma multiplicity_removeAll_eq:
+  forall x s, wf s ->
+  multiplicity x (removeAll x s) = 0.
+Proof.
+Admitted.
+
+(* La multiplicité des autres éléments ne change pas *)
+Lemma multiplicity_removeAll_neq:
+  forall x y s, wf s -> x <> y ->
+  multiplicity y (removeAll x s) = multiplicity y s.
+Proof.
+Admitted.
+
+(* L'élément n'est plus InMultiset après removeAll *)
+Lemma not_InMultiset_removeAll:
+  forall x s, wf s ->
+  ~ InMultiset x (removeAll x s).
+Proof.
+Admitted.
+
+(* InMultiset préservé pour les autres éléments *)
+Lemma InMultiset_removeAll_other:
+  forall x y s, wf s -> x <> y ->
+  (InMultiset y (removeAll x s) <-> InMultiset y s).
+Proof.
+Admitted.
+
+(* removeAll préserve wf *)
+Lemma removeAll_wf:
+  forall x s, wf s -> wf (removeAll x s).
+Proof.
+Admitted.
+
+(* removeAll est idempotent *)
+Lemma removeAll_idempotent:
+  forall x s, wf s ->
+  removeAll x (removeAll x s) = removeAll x s.
+Proof.
+Admitted.
+
+(* removeOne sur un élément absent ne change rien *)
+Lemma removeOne_not_member:
+  forall x s, wf s -> ~ InMultiset x s ->
+  removeOne x s = s.
+Proof.
+Admitted.
+
+(* removeAll sur un élément absent ne change rien *)
+Lemma removeAll_not_member:
+  forall x s, wf s -> ~ InMultiset x s ->
+  removeAll x s = s.
+Proof.
+Admitted.
