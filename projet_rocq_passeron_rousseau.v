@@ -372,7 +372,7 @@ Qed.
 
 Definition first_true_rest_false (p : A -> bool) (l : list A) : Prop :=
   match l with
-  | [] => True
+  | [] => False
   | x :: xs => p x = true /\ Forall (fun y => p y = false) xs
   end.
 
@@ -425,15 +425,15 @@ Proof.
         unfold first_true_rest_false.
         destruct (rev curr ++ [a]) eqn: Hrca.
         --trivial.
+          destruct (rev curr).
+          simpl in Hrca.
+          discriminate Hrca.
+          discriminate Hrca.
         --unfold first_true_rest_false in H0.
           destruct (rev curr) eqn: Hcurr.
           ++simpl in Hrca.
             inversion Hrca.
-            split.
-            **subst a0.
-              subst acc_current.
-              admit.
-            ** apply Forall_nil.
+            contradiction.
           ++inversion Hrca.
             subst a1.
             destruct H0 as [Hpa0 Hpl0].
@@ -448,7 +448,7 @@ Proof.
       * apply IHl.
         exact H.
         trivial.
-Admitted.
+Qed.
 
 Theorem split_p_all_lists_Forall :
   forall (p : A -> bool) (l : list A),
