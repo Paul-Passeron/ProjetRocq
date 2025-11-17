@@ -266,7 +266,53 @@ Qed.
 
 (** ** Question 4 *)
 
-(** TODO *)
+(** * a) *)
+
+(* Fonction qui collecte les éléments jusqu'au prochain qui satisfait p (exclus) *)
+Fixpoint collect_until {A : Type} (p : A -> bool) (l : list A) : list A * list A :=
+  match l with
+  | [] => ([], [])
+  | x :: xs =>
+      if p x then ([], l)
+      else 
+        let (collected, rest) := collect_until p xs in
+        (x :: collected, rest)
+  end.
+
+Require Import List.
+Require Import Arith.
+Require Import Lia.
+Import ListNotations.
+
+Require Import Recdef.
+
+Function split_p_all {A : Type} (p : A -> bool) (l : list A) 
+  {measure length l} : list A * list (list A) :=
+  match l with
+  | [] => ([], [])
+  | x :: xs =>
+      if p x then
+        let (current, rest) := collect_until p xs in
+        let (prefix, lists) := split_p_all p rest in
+        ([], (x :: current) :: lists)
+      else
+        let (prefix, lists) := split_p_all p xs in
+        (x :: prefix, lists)
+  end.
+Proof.
+  - (* Prouver que length rest < length (x :: xs) *)
+    intros.
+    simpl.
+    assert (H: length rest <= length xs).
+    {
+     admit. 
+    }
+    lia.
+  - (* Prouver que length xs < length (x :: xs) *)
+    intros. simpl. lia.
+Admitted.
+
+
 
 (** * Partie 2 : Implantation des multi-ensembles *)
 
