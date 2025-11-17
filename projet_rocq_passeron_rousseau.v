@@ -1150,6 +1150,42 @@ Proof.
     exact (IHs Hwfs H).
 Qed.
 
+Lemma InMultiset_removeOne_other_2:
+forall x y s, wf s -> x <> y ->
+  InMultiset y s -> InMultiset y (removeOne x s).
+Proof.
+  intros x y s Hwfs Hxy H.
+  induction s.
+  simpl.
+  assumption.
+  unfold InMultiset in *.
+  destruct a as [a an].
+  simpl.
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  - subst x.
+    destruct (an == 1) as [Han | Han].
+    + assert (an = 1). assumption.
+      subst an.
+      simpl.
+      simpl in H.
+      destruct (T_eq_dec a y) as [Hay | Hay].
+      * contradiction.
+      * exact H.
+    + assert (H0 : an <> 1). assumption.
+      apply Nat.eqb_neq in H0.
+      rewrite H0.
+      simpl.
+      simpl in H.
+      destruct (T_eq_dec a y) as [Hay | Hay].
+      * contradiction.
+      * exact H. 
+  - simpl.
+    simpl in H.
+    destruct (T_eq_dec a y).
+    reflexivity.
+    destruct Hwfs as [_ [_ Hwfs]].
+    exact (IHs Hwfs H).
+Qed.
 
 
 (* InMultiset préservé pour les autres éléments *)
@@ -1157,7 +1193,11 @@ Lemma InMultiset_removeOne_other:
   forall x y s, wf s -> x <> y ->
   (InMultiset y (removeOne x s) <-> InMultiset y s).
 Proof.
-Admitted.
+  intros x y s H Hxy.
+  split.
+  - intro H0. exact (InMultiset_removeOne_other_1 x y s H Hxy H0).
+  - intro H0. exact (InMultiset_removeOne_other_2 x y s H Hxy H0).
+Qed.
 
 
 
