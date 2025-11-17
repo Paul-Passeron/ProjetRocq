@@ -1,21 +1,28 @@
-\documentclass{report}
-
+\documentclass{article}
 \usepackage{coqdoc}  % <---- ESSENTIEL
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{hyperref}
 
-\title{Projet PRFM 2025}
-\author{Paul PASSERON & Jean ROUSSEAU}
-\date{\today}
-
 \begin{document}
 
-\maketitle
-\setcounter{page}{1}
+\input{titre.tex}
 
-\tableofcontents
-\cleardoublepage
+	\vfill 
+	    
+	\tableofcontents
+		
+	\vfill 
+
+
+\section{Introduction} 
+
+\subsection{Contexte}
+\label{sec:Contexte}
+
+	aaa
+
+\section{COQDOC}
 
 \input{coq_body.tex}  % <--- fichier généré par le Makefile
 

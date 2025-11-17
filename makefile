@@ -1,5 +1,6 @@
 COQDOC = coqdoc
 PDFLATEX = pdflatex
+LATEXMK = latexmk
 SRC = $(wildcard *.v)
 BODY = coq_body.tex
 OUT = rapport.pdf
@@ -13,9 +14,7 @@ $(BODY): $(SRC)
 	$(COQDOC) --latex --body-only -o $(BODY) $(SRC)
 
 $(OUT): $(BODY) $(WRAPPER)
-	$(PDFLATEX) $(WRAPPER)
-	$(PDFLATEX) $(WRAPPER)
-	mv $(basename $(WRAPPER)).pdf $(OUT)
+	$(LATEXMK) $(WRAPPER)
 
 clean:
 	rm -f $(BODY) *.aux *.log *.toc *.out *.idx *.ilg *.ind rapport.pdf
