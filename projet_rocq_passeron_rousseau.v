@@ -1215,7 +1215,23 @@ Lemma not_InMultiset_removeAll:
   forall x s, wf s ->
   ~ InMultiset x (removeAll x s).
 Proof.
-Admitted.
+  intros x s Hwfs.
+  induction s.
+  unfold InMultiset in *. discriminate.
+  unfold InMultiset in *.
+  destruct a as [a an].
+  simpl.
+  destruct Hwfs as [H0 [H1 H2]].
+  destruct (T_eq_dec a x) as [Hax | Hax].
+  - subst x.
+    assert (H:= all_diff_means_not_in a s H2 H1).
+    rewrite H.
+    discriminate.
+  - simpl.
+    destruct (T_eq_dec a x).
+    contradiction.
+    exact (IHs H2).
+Qed.
 
 (* InMultiset préservé pour les autres éléments *)
 Lemma InMultiset_removeAll_other:
