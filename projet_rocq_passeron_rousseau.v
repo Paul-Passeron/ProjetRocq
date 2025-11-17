@@ -299,7 +299,12 @@ Definition split_p_all {A : Type} (p : A -> bool) (l : list A) : list A * list (
 
 Compute (split_p_all Nat.even [1; 3; 2; 5;7;8;10;11]). 
 
+(** * b) *)
 
+Lemma split_p_all_fst_no_sat_p:
+  forall {A: Type} (p: A -> bool) l, Forall (fun x => p x = false) (fst (split_p_all p l)).
+Proof.
+Admitted.
 
 (** * Partie 2 : Implantation des multi-ensembles *)
 
